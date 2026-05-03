@@ -6,7 +6,7 @@ import (
 	"hobby-blog/internal/handler"
 )
 
-func SetUpRouter(h *handler.Handlers) *gin.Engine  {
+func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
 	r := gin.Default()
 	r.Use(cors.Default())
 
