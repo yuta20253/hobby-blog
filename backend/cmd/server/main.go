@@ -1,11 +1,8 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-
 	"hobby-blog/internal/db"
 	"hobby-blog/internal/router"
-	"hobby-blog/internal/handler"
 	"hobby-blog/internal/container"
 )
 
