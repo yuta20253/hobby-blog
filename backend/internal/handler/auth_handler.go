@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"net/http"
-	"gorm.io/gorm"
 	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/service"
 )
