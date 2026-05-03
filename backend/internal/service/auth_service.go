@@ -1,12 +1,11 @@
 package service
 
 import (
-	"gorm.io/gorm"
 	"hobby-blog/internal/repository"
 )
 
 type AuthService struct {
-	repository  *repository.UserRepository
+	repo  *repository.UserRepository
 }
 
 func NewAuthService(repo *repository.UserRepository) *AuthService {
@@ -14,5 +13,5 @@ func NewAuthService(repo *repository.UserRepository) *AuthService {
 }
 
 func (s *AuthService) SignUp() error {
-	return s.repository.Create()
+	return s.repo.Create()
 }
