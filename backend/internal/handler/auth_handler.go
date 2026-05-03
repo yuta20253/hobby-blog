@@ -12,9 +12,9 @@ type AuthHandler struct {
 	service *service.AuthService
 }
 
-func NewAuthHandler(db *gorm.DB) *AuthHandler {
+func NewAuthHandler(repo *repository.UserRepository) *AuthHandler {
 	return &AuthHandler{
-		service: service.NewAuthService(db),
+		service: service.NewAuthService(repo),
 	}
 }
 

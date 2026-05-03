@@ -1,15 +1,19 @@
 import service
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"hobby-blog/internal/repository"
+)
+ "gorm.io/gorm"
 
 type AuthService struct {
-	db *gorm.DB
+	repository  *repository.UserRepository
 }
 
-func NewAuthService(db *gorm.DB) *AuthService {
-	return &AuthService{db: db}
+func NewAuthService(repo *repository.UserRepository) *AuthService {
+	return &AuthService{repo: repo}
 }
 
 func (s *AuthService) SignUp() error {
-	return nil
+	return &s.UserRepository.Create()
 }
