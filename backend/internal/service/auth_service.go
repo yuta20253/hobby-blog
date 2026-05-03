@@ -4,7 +4,6 @@ import (
 	"gorm.io/gorm"
 	"hobby-blog/internal/repository"
 )
- "gorm.io/gorm"
 
 type AuthService struct {
 	repository  *repository.UserRepository
