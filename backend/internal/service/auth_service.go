@@ -1,4 +1,4 @@
-import service
+package service
 
 import (
 	"gorm.io/gorm"
@@ -15,5 +15,5 @@ func NewAuthService(repo *repository.UserRepository) *AuthService {
 }
 
 func (s *AuthService) SignUp() error {
-	return &s.UserRepository.Create()
+	return s.repository.Create()
 }

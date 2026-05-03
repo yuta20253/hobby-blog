@@ -6,14 +6,15 @@ import (
 	"hobby-blog/internal/db"
 	"hobby-blog/internal/router"
 	"hobby-blog/internal/handler"
+	"hobby-blog/internal/container"
 )
 
 func main()  {
 	dbConn := db.ConnectDB()
 
-	handlers := handler.NewHandlers(dbConn)
+	c := container.NewContainer(dbConn)
 
-	r := router.SetUpRouter(handlers)
+	r := router.SetUpRouter(c.AuthHandler)
 
 	r.Run(":8080")
 }

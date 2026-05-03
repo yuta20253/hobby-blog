@@ -11,8 +11,9 @@ func SetUpRouter(h *handler.Handlers) *gin.Engine  {
 	r.Use(cors.Default())
 
 	api := r.Group("/api")
+	auth := api.Group("/auth")
 
-	api.POST("/signup", h.Auth.SignUp)
+	auth.POST("/signup", h.Auth.SignUp)
 
 	return r
 }
