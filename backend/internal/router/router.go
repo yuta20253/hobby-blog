@@ -13,7 +13,7 @@ func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
 	api := r.Group("/api")
 	auth := api.Group("/auth")
 
-	auth.POST("/signup", h.Auth.SignUp)
+	auth.POST("/signup", h.service.SignUp)
 
 	return r
 }
