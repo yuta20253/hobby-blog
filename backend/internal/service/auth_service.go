@@ -66,7 +66,7 @@ func (s *AuthService) Login(email, rawPassword string) (*LoginResult, error) {
 
 	token, err := auth.GenerateToken(user.ID)
 	if err != nil {
-		nil, err
+		return nil, err
 	}
 
 	return &LoginResult{
