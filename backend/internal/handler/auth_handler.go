@@ -30,7 +30,7 @@ func (h *AuthHandler) SignUp(c *gin.Context)  {
 		return
 	}
 
-	err := h.service.SignUp(req.Name, req.Email, req.Password)
+	result, err := h.service.SignUp(req.Name, req.Email, req.Password)
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -40,6 +40,7 @@ func (h *AuthHandler) SignUp(c *gin.Context)  {
 	}
 
 	c.JSON(200, gin.H{
-		"message": "signup ok",
+		"user":  result.User,
+		"token": result.Token,
 	})
 }
