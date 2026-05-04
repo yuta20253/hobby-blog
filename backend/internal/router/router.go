@@ -22,6 +22,10 @@ func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
 
 	auth.POST("/signup", h.SignUp)
 	auth.POST("/login", h.Login)
+
+	authWithAuth := auth.Group("")
+	authWithAuth.Use(middleware.AuthMiddleware())
+
 	auth.DELETE("/logout", h.Logout)
 	auth.GET("/me", h.Me)
 
