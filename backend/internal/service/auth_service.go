@@ -12,8 +12,8 @@ type AuthService struct {
 }
 
 type SignUpResult struct {
-	User model.User,
-	Token string,
+	User model.User
+	Token string
 }
 
 func NewAuthService(repo *repository.UserRepository) *AuthService {
