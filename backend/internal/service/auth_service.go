@@ -11,7 +11,7 @@ type AuthService struct {
 	repo  *repository.UserRepository
 }
 
-type SignUpResult struct {
+type AuthResult struct {
 	User model.User
 	Token string
 }
@@ -25,7 +25,7 @@ func NewAuthService(repo *repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(name, email, rawPassword string) (*SignUpResult, error) {
+func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, error) {
 	hashedPassword, err := password.Hash(rawPassword)
 
 	if err != nil {
@@ -53,7 +53,7 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*SignUpResult, er
 	}, nil
 }
 
-func (s *AuthService) Login(email, rawPassword string) (*LoginResult, error) {
+func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 	user, err := s.repo.FindByEmail(email)
 
 	if err != nil {
@@ -72,5 +72,5 @@ func (s *AuthService) Login(email, rawPassword string) (*LoginResult, error) {
 	return &LoginResult{
 		User: user,
 		Token: token,
-	}
+	}, nil
 }
