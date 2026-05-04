@@ -16,6 +16,11 @@ type SignUpResult struct {
 	Token string
 }
 
+type LoginResult struct {
+	User model.User
+	Token string
+}
+
 func NewAuthService(repo *repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
@@ -46,4 +51,26 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*SignUpResult, er
 		User: user,
 		Token: token,
 	}, nil
+}
+
+func (s *AuthService) Login(email, rawPassword string) (*LoginResult, error) {
+	user, err := s.repo.FindByEmail(email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := password.Compare(user.PasswordHash, rawPassword) ; err != nil {
+		return nil, err
+	}
+
+	token, err := auth.GenerateToken(user.ID)
+	if err != nil {
+		nil, err
+	}
+
+	return &LoginResult{
+		User: user,
+		Token: token,
+	}
 }

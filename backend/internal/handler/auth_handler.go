@@ -16,13 +16,18 @@ type SignUpRequest struct {
 	Password string `json:"password"`
 }
 
+type LoginRequest struct {
+	Email string `json:"email"`
+	Password string `json:"password"`
+}
+
 func NewAuthHandler(service *service.AuthService) *AuthHandler {
 	return &AuthHandler{
 		service: service,
 	}
 }
 
-func (h *AuthHandler) SignUp(c *gin.Context)  {
+func (h *AuthHandler) SignUp(c *gin.Context) {
 	var req SignUpRequest
 
 	if err := c.ShouldBindJSON(&req) ;err != nil {
@@ -43,4 +48,24 @@ func (h *AuthHandler) SignUp(c *gin.Context)  {
 		"user":  result.User,
 		"token": result.Token,
 	})
+}
+
+func (h *AuthHandler) Login(c *gin.Context) {
+	var req LoginRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": "invalid request"})
+		return
+	}
+
+	result, err := h.service.Login(req.Email, req.Password)
+	if (err != nil) {
+		c.JSON(401, gin.H{"error": "invalid credentials"})
+		return
+	}
+
+	return &LoginResult{
+		"user": result.User,
+		"token": result.Token,
+	}
 }
