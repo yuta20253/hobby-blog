@@ -11,9 +11,15 @@ type AuthService struct {
 	repo  *repository.UserRepository
 }
 
+type UserResponse struct {
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type AuthResult struct {
-	User model.User
-	Token string
+	User UserResponse `json:"user"`
+	Token string `json:"token"`
 }
 
 func NewAuthService(repo *repository.UserRepository) *AuthService {
@@ -43,7 +49,11 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 	}
 
 	return &AuthResult{
-		User: user,
+		User: UserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		},
 		Token: token,
 	}, nil
 }
@@ -65,7 +75,11 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 	}
 
 	return &AuthResult{
-		User: user,
+		User: UserResponse{
+			ID:    user.ID,
+			Name:  user.Name,
+			Email: user.Email,
+		},
 		Token: token,
 	}, nil
 }
