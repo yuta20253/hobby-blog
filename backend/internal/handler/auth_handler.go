@@ -96,7 +96,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 	user, err := h.service.GetUserByID(id)
 	if err != nil {
 		c.JSON(404, gin.H{
-			"error": "user not found"
+			"error": "user not found",
 		})
 		return
 	}
