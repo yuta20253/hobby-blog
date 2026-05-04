@@ -27,8 +27,8 @@ func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
 	authWithAuth := auth.Group("")
 	authWithAuth.Use(middleware.AuthMiddleware())
 
-	auth.DELETE("/logout", h.Logout)
-	auth.GET("/me", h.Me)
+	authWithAuth.DELETE("/logout", h.Logout)
+	authWithAuth.GET("/me", h.Me)
 
 	return r
 }
