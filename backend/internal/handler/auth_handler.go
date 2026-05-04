@@ -64,8 +64,8 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	return &LoginResult{
+	c.JSON(200, gin.H{
 		"user": result.User,
 		"token": result.Token,
-	}
+	})
 }
