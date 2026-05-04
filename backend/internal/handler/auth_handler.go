@@ -75,3 +75,33 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		"message": "logout success",
 	})
 }
+
+func (h *AuthHandler) Me(c *gin.Context) {
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	id, ok := userID.(uint)
+
+	if !ok {
+		c.JSON(500, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	user, err := h.service.GetUserByID(id)
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "user not found"
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user": user,
+	})
+}

@@ -83,3 +83,17 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 		Token: token,
 	}, nil
 }
+
+func (s *AuthService) GetUserByID(id uint) (*UserResponse, error) {
+	user, err := s.repo.FindByID(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserResponse{
+		ID: user.ID,
+		Name: user.Name,
+		Email: user.Email,
+	}, nil
+}
