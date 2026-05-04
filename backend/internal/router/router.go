@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"hobby-blog/internal/handler"
+	"hobby-blog/internal/middleware"
 )
 
 func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
