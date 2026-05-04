@@ -16,11 +16,6 @@ type AuthResult struct {
 	Token string
 }
 
-type LoginResult struct {
-	User model.User
-	Token string
-}
-
 func NewAuthService(repo *repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
@@ -47,7 +42,7 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 		return nil, err
 	}
 
-	return &SignUpResult{
+	return &AuthResult{
 		User: user,
 		Token: token,
 	}, nil
@@ -69,7 +64,7 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 		return nil, err
 	}
 
-	return &LoginResult{
+	return &AuthResult{
 		User: user,
 		Token: token,
 	}, nil
