@@ -24,7 +24,7 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*SignUpResult, er
 	hashedPassword, err := password.Hash(rawPassword)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	user := model.User{
