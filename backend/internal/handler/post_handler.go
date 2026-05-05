@@ -28,7 +28,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 
 	if err := c.ShouldBindQuery(&q); err != nil {
 		c.JSON(400, gin.H{
-			"error": "invalid query"
+			"error": "invalid query",
 		})
 		return
 	}
@@ -37,7 +37,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(500, gin.H{
-			"error": "failed to fetch posts"
+			"error": "failed to fetch posts",
 		})
 		return
 	}
