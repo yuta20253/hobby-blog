@@ -37,8 +37,8 @@ func SetUpRouter(
 	private.DELETE("/logout", authHandler.Logout)
 	private.GET("/me", authHandler.Me)
 
-	// postsPrivate := private.Group("/posts")
-	// postsPrivate.POST("", postHandler.Create)
+	postsPrivate := private.Group("/posts")
+	postsPrivate.POST("", postHandler.Create)
 	// postsPrivate.PATCH("/:id", postHandler.Update)
 	// postsPrivate.DELETE("/:id", postHandler.Delete)
 

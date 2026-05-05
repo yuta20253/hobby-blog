@@ -18,6 +18,12 @@ type PostSearchQuery struct {
 	Offset   int          `form:"offset"`
 }
 
+type CreatePostRequest struct {
+	Title string `json:"title" binding:"required,max=255"`
+	Content string `json:"content" binding:"required"`
+	CategoryID uint `json:"category_id" binding:"required"`
+}
+
 func NewPostHandler(service *service.PostService) *PostHandler {
 	return &PostHandler{
 		service: service,
@@ -79,5 +85,50 @@ func (h *PostHandler) Show(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"post": post,
+	})
+}
+
+func (h *PostHandler)Create(c *gin.Context) {
+	var req CreatePostRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid request",
+		})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	id, ok := userID.(uint)
+
+	if !ok {
+		c.JSON(500, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	serviceInput := service.CreatePostInput{
+		Title: req.Title,
+		Content: req.Content,
+		CategoryID: req.CategoryID,
+		UserID: id,
+	}
+
+	err := h.service.CreatePost(serviceInput)
+
+	if err != nil {
+		c.JSON(500, gin.H{ "error": "failed" })
+		return
+	}
+
+	c.JSON(201, gin.H{
+		"message": "success create post",
 	})
 }

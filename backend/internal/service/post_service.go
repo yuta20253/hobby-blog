@@ -39,6 +39,13 @@ type PostSearchQuery struct {
 	Offset   int
 }
 
+type CreatePostInput struct {
+	Title      string
+	Content    string
+	CategoryID uint
+	UserID     uint
+}
+
 func NewPostService(repo *repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
@@ -90,4 +97,15 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 			Name: post.Category.Name,
 		},
 	}, nil
+}
+
+func (s *PostService) CreatePost(req CreatePostInput) error {
+	param := repository.CreatePostParams{
+		Title:      req.Title,
+		Content:    req.Content,
+		CategoryID: req.CategoryID,
+		UserID:     req.UserID,
+	}
+
+	return s.repo.Create(param)
 }

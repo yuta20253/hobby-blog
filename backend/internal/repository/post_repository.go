@@ -17,6 +17,13 @@ type PostSearchQuery struct {
 	Offset   int
 }
 
+type CreatePostParams struct {
+	Title      string
+	Content    string
+	CategoryID uint
+	UserID     uint
+}
+
 func NewPostRepository(db *gorm.DB) *PostRepository {
 	return &PostRepository{db: db}
 }
@@ -63,4 +70,16 @@ func (r *PostRepository) Get(id uint) (model.Post, error) {
 	var post model.Post
 	err := r.db.Preload("User").Preload("Category").First(&post, id).Error
 	return post, err
+}
+
+func (r *PostRepository) Create(param CreatePostParams) error {
+	post := model.Post{
+		UserID: param.UserID,
+		CategoryID: param.CategoryID,
+		Title: param.Title,
+		Content: param.Content,
+		Status: "draft",
+	}
+
+	return r.db.Create(&post).Error
 }
