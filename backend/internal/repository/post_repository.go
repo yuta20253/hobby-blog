@@ -58,3 +58,9 @@ func (r *PostRepository) Search(q PostSearchQuery) ([]model.Post, error) {
 
 	return posts, nil
 }
+
+func (r *PostRepository) Get(id uint) (model.Post, error) {
+	var post model.Post
+	err := r.db.Preload("User").Preload("Category").First(&post, id).Error
+	return post, err
+}

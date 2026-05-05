@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/service"
+	"strconv"
 )
 
 type PostHandler struct {
@@ -52,5 +53,31 @@ func (h *PostHandler) Index(c *gin.Context) {
 
 	c.JSON(200, gin.H{
 		"posts": posts,
+	})
+}
+
+func (h *PostHandler) Show(c *gin.Context) {
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid id",
+		})
+		return
+	}
+
+	post, err := h.service.GetPost(uint(id))
+
+	if err != nil {
+		c.JSON(404, gin.H{
+			"error": "failed to fetch post",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"post": post,
 	})
 }

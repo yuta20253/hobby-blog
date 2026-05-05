@@ -13,6 +13,24 @@ type PostResponse struct {
 	Title string `json:"title"`
 }
 
+type UserResponse struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+type CategoryResponse struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+type PostDetailResponse struct {
+	ID uint `json:"id"`
+	Title string `json:"title"`
+	Content string `json:"content"`
+	User UserResponse `json:"user"`
+	Category CategoryResponse `json:"category"`
+}
+
 type PostSearchQuery struct {
 	Title    string
 	UserName string
@@ -50,4 +68,26 @@ func (s *PostService) SearchPosts(q PostSearchQuery) ([]PostResponse, error) {
 	}
 
 	return res, nil
+}
+
+func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
+	post, err := s.repo.Get(id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &PostDetailResponse{
+		ID: post.ID,
+		Title: post.Title,
+		Content: post.Content,
+		User: UserResponse{
+			ID: post.User.ID,
+			Name: post.User.Name,
+		},
+		Category: CategoryResponse{
+			ID: post.Category.ID,
+			Name: post.Category.Name,
+		},
+	}, nil
 }

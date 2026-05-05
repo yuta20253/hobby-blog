@@ -29,7 +29,7 @@ func SetUpRouter(
 
 	posts := api.Group("/posts")
 	posts.GET("", postHandler.Index)
-	// posts.GET("/:id", postHandler.Show)
+	posts.GET("/:id", postHandler.Show)
 
 	private := api.Group("")
 	private.Use(middleware.AuthMiddleware())
