@@ -13,7 +13,7 @@ type PostResponse struct {
 	Title string `json:"title"`
 }
 
-type UserResponse struct {
+type PostUserResponse struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
 }
@@ -81,7 +81,7 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		ID: post.ID,
 		Title: post.Title,
 		Content: post.Content,
-		User: UserResponse{
+		User: PostUserResponse{
 			ID: post.User.ID,
 			Name: post.User.Name,
 		},
