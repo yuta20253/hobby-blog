@@ -29,7 +29,7 @@ func SetUpRouter(
 
 	posts := api.Group("/posts")
 	posts.GET("", postHandler.Index)
-	posts.GET("/:id", postHandler.Show)
+	// posts.GET("/:id", postHandler.Show)
 
 	private := api.Group("")
 	private.Use(middleware.AuthMiddleware())
@@ -37,10 +37,10 @@ func SetUpRouter(
 	private.DELETE("/logout", authHandler.Logout)
 	private.GET("/me", authHandler.Me)
 
-	postsPrivate := private.Group("/posts")
-	postsPrivate.POST("", postHandler.Create)
-	postsPrivate.PATCH("/:id", postHandler.Update)
-	postsPrivate.DELETE("/:id", postHandler.Delete)
+	// postsPrivate := private.Group("/posts")
+	// postsPrivate.POST("", postHandler.Create)
+	// postsPrivate.PATCH("/:id", postHandler.Update)
+	// postsPrivate.DELETE("/:id", postHandler.Delete)
 
 	return r
 }
