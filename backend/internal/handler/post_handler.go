@@ -33,7 +33,15 @@ func (h *PostHandler) Index(c *gin.Context) {
 		return
 	}
 
-	posts, err := h.service.SearchPosts(q)
+	serviceQuery := service.PostSearchQuery{
+		Title:    q.Title,
+		UserName: q.UserName,
+		Category: q.Category,
+		Limit:    q.Limit,
+		Offset:   q.Offset,
+	}
+
+	posts, err := h.service.SearchPosts(serviceQuery)
 
 	if err != nil {
 		c.JSON(500, gin.H{
