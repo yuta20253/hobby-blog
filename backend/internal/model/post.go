@@ -1,6 +1,6 @@
 package model
 
-import "time"
+import "gorm.io/gorm"
 
 type Post struct {
 	gorm.Model
