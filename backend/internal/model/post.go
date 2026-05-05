@@ -12,6 +12,6 @@ type Post struct {
 	CreatedAt  time.Time `gorm:"not null"`
 	UpdatedAt  time.Time `gorm:"not null"`
 
-	User User `gorm:"foreignKey:"UserID""`
-	Category Category `gorm:"foreignKey":"CategoryID"`
+	User       User     `gorm:"foreignKey:UserID;references:ID"`
+	Category   Category `gorm:"foreignKey:CategoryID;references:ID"`
 }
