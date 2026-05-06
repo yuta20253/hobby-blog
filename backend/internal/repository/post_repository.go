@@ -34,8 +34,9 @@ func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 		query = query.Where("categories.name LIKE ?", "%"+q.Category+"%")
 	}
 
-	if q.Limit == 0 {
-		q.Limit = 10
+	limit := q.Limit
+	if limit == 0 {
+		limit = 10
 	}
 
 	query = query.
@@ -59,7 +60,7 @@ func (r *PostRepository) Get(id uint) (model.Post, error) {
 }
 
 func (r *PostRepository) Create(param post.CreateInput) error {
-	post := model.Post{
+	p := model.Post{
 		UserID: param.UserID,
 		CategoryID: param.CategoryID,
 		Title: param.Title,
@@ -67,5 +68,5 @@ func (r *PostRepository) Create(param post.CreateInput) error {
 		Status: "draft",
 	}
 
-	return r.db.Create(&post).Error
+	return r.db.Create(&p).Error
 }
