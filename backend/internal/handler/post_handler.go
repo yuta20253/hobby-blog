@@ -232,7 +232,7 @@ func (h *PostHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := h.service.DeletePost(uint(id), uid)
+	err = h.service.DeletePost(uint(id), uid)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
