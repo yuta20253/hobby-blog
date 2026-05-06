@@ -65,7 +65,7 @@ func (r *PostRepository) Create(param post.CreateInput) error {
 		CategoryID: param.CategoryID,
 		Title: param.Title,
 		Content: param.Content,
-		Status: "draft",
+		Status: post.StatusDraft,
 	}
 
 	return r.db.Create(&p).Error
@@ -92,4 +92,21 @@ func (r *PostRepository) Update(param post.UpdateInput) (model.Post, error) {
 	err := r.db.Preload("User").Preload("Category").First(&post, param.ID).Error
 
 	return post, err
+}
+
+func (r *PostRepository) Delete(id uint, userID uint) error {
+
+	result := r.db.
+		Where("id = ? AND user_id = ?", id, userID).
+		Delete(&model.Post{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }

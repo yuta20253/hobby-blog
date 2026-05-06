@@ -34,6 +34,36 @@ type UpdatePostRequest struct {
 	Status     post.Status `json:"status" binding:"required"`
 }
 
+func (q PostSearchQuery) ToDomain() post.SearchQuery {
+	return post.SearchQuery{
+		Title:    q.Title,
+		UserName: q.UserName,
+		Category: q.Category,
+		Limit:    q.Limit,
+		Offset:   q.Offset,
+	}
+}
+
+func (r CreatePostRequest) ToDomain(userID uint) post.CreateInput {
+	return post.CreateInput{
+		Title: r.Title,
+		Content: r.Content,
+		CategoryID: r.CategoryID,
+		UserID: userID,
+	}
+}
+
+func (r UpdatePostRequest) ToDomain(id uint, userID uint) post.UpdateInput {
+	return post.UpdateInput{
+		ID: id,
+		Title: r.Title,
+		Content: r.Content,
+		CategoryID: r.CategoryID,
+		UserID: userID,
+		Status: r.Status,
+	}
+}
+
 func NewPostHandler(service *service.PostService) *PostHandler {
 	return &PostHandler{
 		service: service,
@@ -50,15 +80,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 		return
 	}
 
-	query := post.SearchQuery{
-		Title:    q.Title,
-		UserName: q.UserName,
-		Category: q.Category,
-		Limit:    q.Limit,
-		Offset:   q.Offset,
-	}
-
-	posts, err := h.service.SearchPosts(query)
+	posts, err := h.service.SearchPosts(q.ToDomain())
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -124,14 +146,7 @@ func (h *PostHandler)Create(c *gin.Context) {
 		return
 	}
 
-	input := post.CreateInput{
-		Title: req.Title,
-		Content: req.Content,
-		CategoryID: req.CategoryID,
-		UserID: id,
-	}
-
-	err := h.service.CreatePost(input)
+	err := h.service.CreatePost(req.ToDomain(uint(id)))
 
 	if err != nil {
 		c.JSON(500, gin.H{ "error": "failed" })
@@ -176,16 +191,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	input := post.UpdateInput{
-		ID: uint(id),
-		Title: req.Title,
-		Content: req.Content,
-		CategoryID: req.CategoryID,
-		UserID: uid,
-		Status: req.Status,
-	}
-
-	updatedPost, err := h.service.UpdatePost(input)
+	updatedPost, err := h.service.UpdatePost(req.ToDomain(uint(id), uid))
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -200,4 +206,42 @@ func (h *PostHandler) Update(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"post": updatedPost,
 	})
+}
+
+func (h *PostHandler) Delete(c *gin.Context) {
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+
+	if err != nil {
+		c.JSON(400, gin.H{ "error": "invalid id" })
+		return
+	}
+
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{ "error": "unauthorized" })
+		return
+	}
+
+	uid, ok := userID.(uint)
+
+	if !ok {
+		c.JSON(500, gin.H{"error": "invalid user id"})
+		return
+	}
+
+	err := h.service.DeletePost(uint(id), uid)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, gin.H{"error": "not found"})
+			return
+		}
+		c.JSON(500, gin.H{"error": "invalid id"})
+		return
+	}
+
+	c.JSON(200, gin.H{ "message": "success delete post" })
 }

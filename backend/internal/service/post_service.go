@@ -113,3 +113,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		},
 	}, nil
 }
+
+func (s *PostService) DeletePost(id uint, userID uint) error {
+	return s.repo.Delete(id, userID)
+}

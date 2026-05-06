@@ -1,5 +1,7 @@
 package post
 
+import "hobby-blog/internal/handler"
+
 type SearchQuery struct {
 	Title    string
 	UserName string
