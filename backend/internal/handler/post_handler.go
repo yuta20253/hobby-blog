@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/service"
+	"hobby-blog/internal/domain/post"
 	"strconv"
 )
 
@@ -11,11 +12,11 @@ type PostHandler struct {
 }
 
 type PostSearchQuery struct {
-	Title    string       `form:"title"`
-	UserName string       `form:"user_name"`
-	Category string       `form:"category"`
-	Limit    int          `form:"limit"`
-	Offset   int          `form:"offset"`
+	Title    string `form:"title"`
+	UserName string `form:"user_name"`
+	Category string `form:"category"`
+	Limit    int    `form:"limit"`
+	Offset   int    `form:"offset"`
 }
 
 type CreatePostRequest struct {
@@ -40,7 +41,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 		return
 	}
 
-	serviceQuery := service.PostSearchQuery{
+	query := post.SearchQuery{
 		Title:    q.Title,
 		UserName: q.UserName,
 		Category: q.Category,
@@ -48,7 +49,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 		Offset:   q.Offset,
 	}
 
-	posts, err := h.service.SearchPosts(serviceQuery)
+	posts, err := h.service.SearchPosts(query)
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -114,14 +115,14 @@ func (h *PostHandler)Create(c *gin.Context) {
 		return
 	}
 
-	serviceInput := service.CreatePostInput{
+	input := post.CreateInput{
 		Title: req.Title,
 		Content: req.Content,
 		CategoryID: req.CategoryID,
 		UserID: id,
 	}
 
-	err := h.service.CreatePost(serviceInput)
+	err := h.service.CreatePost(input)
 
 	if err != nil {
 		c.JSON(500, gin.H{ "error": "failed" })

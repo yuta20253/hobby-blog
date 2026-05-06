@@ -2,6 +2,7 @@ package service
 
 import (
 	"hobby-blog/internal/repository"
+	"hobby-blog/internal/domain/post"
 )
 
 type PostService struct {
@@ -31,35 +32,12 @@ type PostDetailResponse struct {
 	Category CategoryResponse `json:"category"`
 }
 
-type PostSearchQuery struct {
-	Title    string
-	UserName string
-	Category string
-	Limit    int
-	Offset   int
-}
-
-type CreatePostInput struct {
-	Title      string
-	Content    string
-	CategoryID uint
-	UserID     uint
-}
-
 func NewPostService(repo *repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q PostSearchQuery) ([]PostResponse, error) {
-	query := repository.PostSearchQuery{
-		Title: q.Title,
-		UserName: q.UserName,
-		Category: q.Category,
-		Limit: q.Limit,
-		Offset: q.Offset,
-	}
-
-	posts, err := s.repo.Search(query)
+func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
+	posts, err := s.repo.Search(q)
 
 	if err != nil {
 		return nil, err
@@ -99,13 +77,6 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 	}, nil
 }
 
-func (s *PostService) CreatePost(req CreatePostInput) error {
-	param := repository.CreatePostParams{
-		Title:      req.Title,
-		Content:    req.Content,
-		CategoryID: req.CategoryID,
-		UserID:     req.UserID,
-	}
-
-	return s.repo.Create(param)
+func (s *PostService) CreatePost(input post.CreateInput) error {
+	return s.repo.Create(input)
 }

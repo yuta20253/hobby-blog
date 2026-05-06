@@ -3,32 +3,18 @@ package repository
 import (
 	"gorm.io/gorm"
 	"hobby-blog/internal/model"
+	"hobby-blog/internal/domain/post"
 )
 
 type PostRepository struct {
 	db *gorm.DB
 }
 
-type PostSearchQuery struct {
-	Title    string
-	UserName string
-	Category string
-	Limit    int
-	Offset   int
-}
-
-type CreatePostParams struct {
-	Title      string
-	Content    string
-	CategoryID uint
-	UserID     uint
-}
-
 func NewPostRepository(db *gorm.DB) *PostRepository {
 	return &PostRepository{db: db}
 }
 
-func (r *PostRepository) Search(q PostSearchQuery) ([]model.Post, error) {
+func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 	var posts []model.Post
 
 	query := r.db.
@@ -72,7 +58,7 @@ func (r *PostRepository) Get(id uint) (model.Post, error) {
 	return post, err
 }
 
-func (r *PostRepository) Create(param CreatePostParams) error {
+func (r *PostRepository) Create(param post.CreateInput) error {
 	post := model.Post{
 		UserID: param.UserID,
 		CategoryID: param.CategoryID,
