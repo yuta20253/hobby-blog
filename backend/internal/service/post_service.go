@@ -3,6 +3,7 @@ package service
 import (
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/domain/post"
+	"errors"
 )
 
 type PostService struct {
@@ -79,4 +80,36 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 
 func (s *PostService) CreatePost(input post.CreateInput) error {
 	return s.repo.Create(input)
+}
+
+func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, error) {
+	currentPost, err := s.repo.Get(input.ID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft{
+		return nil, errors.New("invalid status transition")
+	}
+
+	post, err := s.repo.Update(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &PostDetailResponse{
+		ID: post.ID,
+		Title: post.Title,
+		Content: post.Content,
+		User: PostUserResponse{
+			ID: post.User.ID,
+			Name: post.User.Name,
+		},
+		Category: CategoryResponse{
+			ID: post.Category.ID,
+			Name: post.Category.Name,
+		},
+	}, nil
 }

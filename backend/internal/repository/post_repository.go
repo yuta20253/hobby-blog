@@ -40,7 +40,7 @@ func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 	}
 
 	query = query.
-		Limit(q.Limit).
+		Limit(limit).
 		Offset(q.Offset).
 		Order("posts.created_at DESC")
 
@@ -69,4 +69,27 @@ func (r *PostRepository) Create(param post.CreateInput) error {
 	}
 
 	return r.db.Create(&p).Error
+}
+
+func (r *PostRepository) Update(param post.UpdateInput) (model.Post, error) {
+	var post model.Post
+	result := r.db.Model(&model.Post{}).
+		Where("id = ? AND user_id = ?", param.ID, param.UserID).
+		Updates(map[string]interface{}{
+			"title": param.Title,
+			"content": param.Content,
+			"category_id": param.CategoryID,
+			"status": param.Status,
+		})
+
+	if result.Error != nil {
+		return post, result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return post, gorm.ErrRecordNotFound
+	}
+	err := r.db.Preload("User").Preload("Category").First(&post, param.ID).Error
+
+	return post, err
 }

@@ -5,6 +5,8 @@ import (
 	"hobby-blog/internal/service"
 	"hobby-blog/internal/domain/post"
 	"strconv"
+	"errors"
+	"gorm.io/gorm"
 )
 
 type PostHandler struct {
@@ -23,6 +25,13 @@ type CreatePostRequest struct {
 	Title string `json:"title" binding:"required,max=255"`
 	Content string `json:"content" binding:"required"`
 	CategoryID uint `json:"category_id" binding:"required"`
+}
+
+type UpdatePostRequest struct {
+	Title      string      `json:"title" binding:"required,max=255"`
+	Content    string      `json:"content" binding:"required"`
+	CategoryID uint        `json:"category_id" binding:"required"`
+	Status     post.Status `json:"status" binding:"required"`
 }
 
 func NewPostHandler(service *service.PostService) *PostHandler {
@@ -131,5 +140,64 @@ func (h *PostHandler)Create(c *gin.Context) {
 
 	c.JSON(201, gin.H{
 		"message": "success create post",
+	})
+}
+
+func (h *PostHandler) Update(c *gin.Context) {
+	var req UpdatePostRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{
+			"error": "invalid request",
+		})
+		return
+	}
+
+	idStr := c.Param("id")
+
+	id, err := strconv.Atoi(idStr)
+
+	if err != nil {
+		c.JSON(400, gin.H{ "error": "invalid id" })
+		return
+	}
+
+	userID, exists := c.Get("userID")
+
+	if !exists {
+		c.JSON(401, gin.H{ "error": "unauthorized" })
+		return
+	}
+
+	uid, ok := userID.(uint)
+
+	if !ok {
+		c.JSON(500, gin.H{ "error": "failed" })
+		return
+	}
+
+	input := post.UpdateInput{
+		ID: uint(id),
+		Title: req.Title,
+		Content: req.Content,
+		CategoryID: req.CategoryID,
+		UserID: uid,
+		Status: req.Status,
+	}
+
+	updatedPost, err := h.service.UpdatePost(input)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(404, gin.H{"error": "not found"})
+			return
+		}
+
+		c.JSON(500, gin.H{ "error": "failed" })
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"post": updatedPost,
 	})
 }
