@@ -11,7 +11,10 @@ func main()  {
 
 	c := container.NewContainer(dbConn)
 
-	r := router.SetUpRouter(c.AuthHandler)
+	r := router.SetUpRouter(
+		c.AuthHandler,
+		c.PostHandler,
+	)
 
 	r.Run(":8080")
 }

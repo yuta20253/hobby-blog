@@ -9,6 +9,7 @@ import (
 
 type Container struct {
 	AuthHandler *handler.AuthHandler
+	PostHandler *handler.PostHandler
 }
 
 func NewContainer(db *gorm.DB) *Container {
@@ -16,7 +17,12 @@ func NewContainer(db *gorm.DB) *Container {
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	postRepo := repository.NewPostRepository(db)
+	postService := service.NewPostService(postRepo)
+	postHandler := handler.NewPostHandler(postService)
+
 	return &Container{
 		AuthHandler: authHandler,
+		PostHandler: postHandler,
 	}
 }

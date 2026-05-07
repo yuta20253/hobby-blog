@@ -8,7 +8,10 @@ import (
 	"hobby-blog/internal/middleware"
 )
 
-func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
+func SetUpRouter(
+		authHandler *handler.AuthHandler,
+		postHandler *handler.PostHandler,
+	) *gin.Engine  {
 	r := gin.Default()
 	r.Use(cors.Default())
 
@@ -19,16 +22,25 @@ func SetUpRouter(h *handler.AuthHandler) *gin.Engine  {
 	}
 
 	api := r.Group("/api")
+
 	auth := api.Group("/auth")
+	auth.POST("/signup", authHandler.SignUp)
+	auth.POST("/login", authHandler.Login)
 
-	auth.POST("/signup", h.SignUp)
-	auth.POST("/login", h.Login)
+	posts := api.Group("/posts")
+	posts.GET("", postHandler.Index)
+	posts.GET("/:id", postHandler.Show)
 
-	authWithAuth := auth.Group("")
-	authWithAuth.Use(middleware.AuthMiddleware())
+	private := api.Group("")
+	private.Use(middleware.AuthMiddleware())
 
-	authWithAuth.DELETE("/logout", h.Logout)
-	authWithAuth.GET("/me", h.Me)
+	private.DELETE("/logout", authHandler.Logout)
+	private.GET("/me", authHandler.Me)
+
+	postsPrivate := private.Group("/posts")
+	postsPrivate.POST("", postHandler.Create)
+	postsPrivate.PATCH("/:id", postHandler.Update)
+	postsPrivate.DELETE("/:id", postHandler.Delete)
 
 	return r
 }

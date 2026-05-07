@@ -11,14 +11,14 @@ type AuthService struct {
 	repo  *repository.UserRepository
 }
 
-type UserResponse struct {
+type AuthUserResponse struct {
 	ID    uint   `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
 type AuthResult struct {
-	User UserResponse `json:"user"`
+	User AuthUserResponse `json:"user"`
 	Token string `json:"token"`
 }
 
@@ -49,7 +49,7 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 	}
 
 	return &AuthResult{
-		User: UserResponse{
+		User: AuthUserResponse{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
@@ -75,7 +75,7 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 	}
 
 	return &AuthResult{
-		User: UserResponse{
+		User: AuthUserResponse{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,
@@ -84,14 +84,14 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 	}, nil
 }
 
-func (s *AuthService) GetUserByID(id uint) (*UserResponse, error) {
+func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
 	user, err := s.repo.FindByID(id)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &UserResponse{
+	return &AuthUserResponse{
 		ID: user.ID,
 		Name: user.Name,
 		Email: user.Email,
