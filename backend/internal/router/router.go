@@ -2,6 +2,7 @@ package router
 
 import (
 	"log"
+	"time"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
 	"hobby-blog/internal/handler"
@@ -13,7 +14,33 @@ func SetUpRouter(
 		postHandler *handler.PostHandler,
 	) *gin.Engine  {
 	r := gin.Default()
-	r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:5173",
+		},
+
+		AllowMethods: []string{
+			"GET",
+			"POST",
+			"PATCH",
+			"DELETE",
+			"OPTIONS",
+		},
+
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Type",
+			"Authorization",
+		},
+
+		ExposeHeaders: []string{
+			"Content-Length",
+		},
+
+		AllowCredentials: true,
+
+		MaxAge: 12 * time.Hour,
+	}))
 
 	if gin.Mode() == gin.DebugMode {
 		for _, route := range r.Routes() {
