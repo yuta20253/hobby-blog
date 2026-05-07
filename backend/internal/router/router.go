@@ -39,8 +39,8 @@ func SetUpRouter(
 
 	postsPrivate := private.Group("/posts")
 	postsPrivate.POST("", postHandler.Create)
-	// postsPrivate.PATCH("/:id", postHandler.Update)
-	// postsPrivate.DELETE("/:id", postHandler.Delete)
+	postsPrivate.PATCH("/:id", postHandler.Update)
+	postsPrivate.DELETE("/:id", postHandler.Delete)
 
 	return r
 }
