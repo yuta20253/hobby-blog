@@ -1,38 +1,34 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { authService } from "../service/authService";
-import { theme } from "../styles/theme";
-import { useRouter } from "vue-router";
-import { useAuth } from "../composables/useAuth";
+    import { ref } from "vue";
+    import { authService } from "../service/authService";
+    import { theme } from "../styles/theme";
+    import { useRouter } from "vue-router";
+    import { useAuth } from "../composables/useAuth";
 
 
-const email = ref<string>("");
-const password = ref<string>("");
-const router = useRouter();
+    const email = ref<string>("");
+    const password = ref<string>("");
+    const isPasswordVisible = ref<boolean>(false);
+    const router = useRouter();
 
-const { setLogin } = useAuth()
+    const { setLocalStorage } = useAuth()
 
-const handleLogin = async () => {
-  const { loginService } = authService()
-  try {
-    const res = await loginService({
-      email: email.value,
-      password: password.value,
-    });
+    const handleLogin = async () => {
+    const { loginService } = authService()
+    try {
+        const {user, token} = await loginService({
+          email: email.value,
+          password: password.value,
+        });
 
-    const user = res.user;
-    localStorage.setItem("user", JSON.stringify(user));
+        setLocalStorage({user,token});
 
-    const token = res?.token;
-    setLogin(token);
+        router.push("/");
 
-    console.log("login success");
-    router.push("/");
-
-  } catch (error) {
-    console.error(error);
-  }
-};
+    } catch (error) {
+        console.error(error);
+    }
+    };
 </script>
 
 <template>
@@ -44,25 +40,39 @@ const handleLogin = async () => {
         アカウントにログインしてください。
       </p>
 
-      <form class="form" @submit.prevent="handleLogin">
+      <form class="form" @submit.prevent="handleLogin" autocomplete="off">
         <div class="form-group">
           <label>メールアドレス</label>
 
           <input
+            name="login_email_input"
             type="email"
             v-model="email"
             placeholder="test@example.com"
+            autocomplete="off"
           />
         </div>
 
         <div class="form-group">
           <label>パスワード</label>
 
-          <input
-            type="password"
-            v-model="password"
-            placeholder="********"
-          />
+          <div class="password-wrapper">
+            <input
+                name="login_password_input"
+                :type="isPasswordVisible ? 'text' : 'password'"
+                v-model="password"
+                placeholder="********"
+                autocomplete="new-password"
+            />
+
+            <button
+                type="button"
+                class="toggle-button"
+                @click="isPasswordVisible = !isPasswordVisible"
+            >
+                {{ isPasswordVisible ? '非表示' : '表示' }}
+            </button>
+          </div>
         </div>
 
         <div class="button-group">
@@ -180,5 +190,25 @@ const handleLogin = async () => {
 
 .cancel-button:hover {
   background-color: v-bind('theme.colors.borderLight');
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+}
+
+.toggle-button {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: v-bind('theme.colors.primary');
+  cursor: pointer;
+  font-size: v-bind('theme.fontSize.sm');
 }
 </style>
