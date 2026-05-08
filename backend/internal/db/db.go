@@ -1,12 +1,12 @@
 package db
 
 import (
-	"os"
 	"fmt"
 	"log"
+	"os"
 
-	"gorm.io/gorm"
 	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
 	"hobby-blog/internal/model"

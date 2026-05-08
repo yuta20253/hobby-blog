@@ -1,18 +1,18 @@
 package router
 
 import (
-	"log"
-	"time"
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/middleware"
+	"log"
+	"time"
 )
 
 func SetUpRouter(
-		authHandler *handler.AuthHandler,
-		postHandler *handler.PostHandler,
-	) *gin.Engine  {
+	authHandler *handler.AuthHandler,
+	postHandler *handler.PostHandler,
+) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
