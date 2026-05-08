@@ -1,52 +1,35 @@
 <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import { theme } from '../styles/theme';
-  import { useAuth } from "../composables/useAuth";
-  import { authService } from '../service/authService';
-  import { useRouter } from 'vue-router';
+import { onMounted } from "vue";
+import { theme } from "../styles/theme";
+import { useAuth } from "../composables/useAuth";
+import { authService } from "../service/authService";
+import { useRouter } from "vue-router";
 
-  const { isAuthenticated } = useAuth();
-  const { logoutService } = authService();
-  const router = useRouter();
+const { isAuthenticated } = useAuth();
+const { logoutService } = authService();
+const router = useRouter();
 
-  onMounted(() => {
-    isAuthenticated.value = !!localStorage.getItem('token');
-  });
+onMounted(() => {
+  isAuthenticated.value = !!localStorage.getItem("token");
+});
 
-  const handleLogout = () => {
-    logoutService();
-    router.push("/login");
-  };
+const handleLogout = () => {
+  logoutService();
+  router.push("/login");
+};
 </script>
 
 <template>
   <header class="header">
-    <div class="logo">
-      Hobby Blog
-    </div>
+    <div class="logo">Hobby Blog</div>
 
     <nav class="nav">
-      <RouterLink
-        to="/"
-        class="nav-link"
-      >
-        Home
-      </RouterLink>
+      <RouterLink to="/" class="nav-link"> Home </RouterLink>
 
-      <RouterLink
-        to="/posts"
-        class="nav-link"
-      >
-        Posts
-      </RouterLink>
+      <RouterLink to="/posts" class="nav-link"> Posts </RouterLink>
 
       <template v-if="isAuthenticated">
-        <RouterLink
-          to="/mypage"
-          class="nav-link"
-        >
-          My Page
-        </RouterLink>
+        <RouterLink to="/mypage" class="nav-link"> My Page </RouterLink>
 
         <button
           type="button"
@@ -58,19 +41,9 @@
       </template>
 
       <template v-else>
-        <RouterLink
-          to="/login"
-          class="nav-link"
-        >
-          Login
-        </RouterLink>
+        <RouterLink to="/login" class="nav-link"> Login </RouterLink>
 
-        <RouterLink
-          to="/signup"
-          class="nav-link"
-        >
-          SignUp
-        </RouterLink>
+        <RouterLink to="/signup" class="nav-link"> SignUp </RouterLink>
       </template>
     </nav>
   </header>
@@ -81,21 +54,21 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: v-bind('theme.spacing.lg');
-  border-bottom: 1px solid v-bind('theme.colors.border');
-  background-color: v-bind('theme.colors.background');
+  padding: v-bind("theme.spacing.lg");
+  border-bottom: 1px solid v-bind("theme.colors.border");
+  background-color: v-bind("theme.colors.background");
 }
 
 .logo {
   font-size: v-bind("theme.fontSize['2xl']");
   font-weight: bold;
-  color: v-bind('theme.colors.textPrimary');
+  color: v-bind("theme.colors.textPrimary");
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: v-bind('theme.spacing.md');
+  gap: v-bind("theme.spacing.md");
 }
 
 .nav-link {
@@ -103,23 +76,23 @@
   align-items: center;
   justify-content: center;
   height: 40px;
-  padding: 0 v-bind('theme.spacing.md');
+  padding: 0 v-bind("theme.spacing.md");
   border: none;
-  border-radius: v-bind('theme.borderRadius.base');
+  border-radius: v-bind("theme.borderRadius.base");
   background: transparent;
   text-decoration: none;
-  color: v-bind('theme.colors.primary');
-  font-size: v-bind('theme.fontSize.base');
+  color: v-bind("theme.colors.primary");
+  font-size: v-bind("theme.fontSize.base");
   font-weight: 600;
   cursor: pointer;
-  transition: all v-bind('theme.transition.base');
+  transition: all v-bind("theme.transition.base");
 }
 
 .nav-link:not(.logout-button):hover {
-  background-color: v-bind('theme.colors.backgroundDark');
+  background-color: v-bind("theme.colors.backgroundDark");
 }
 
 .logout-button:hover {
-  background-color: v-bind('theme.colors.dangerHover');
+  background-color: v-bind("theme.colors.dangerHover");
 }
 </style>

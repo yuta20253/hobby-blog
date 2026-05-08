@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Header from './components/Header.vue'
-import { theme } from './styles/theme'
+import Header from "./components/Header.vue";
+import { theme } from "./styles/theme";
 </script>
 
 <template>
@@ -15,11 +15,11 @@ import { theme } from './styles/theme'
 <style scoped>
 .app {
   min-height: 100vh;
-  background-color: v-bind('theme.colors.background');
+  background-color: v-bind("theme.colors.background");
 }
 
 .main {
-  padding: v-bind('theme.spacing.lg');
+  padding: v-bind("theme.spacing.lg");
   max-width: 1200px;
   margin: 0 auto;
 }

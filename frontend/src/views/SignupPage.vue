@@ -58,11 +58,7 @@ const passwordError = computed(() => {
 });
 
 const isValid = computed(() => {
-  return (
-    !nameError.value &&
-    !emailError.value &&
-    !passwordError.value
-  );
+  return !nameError.value && !emailError.value && !passwordError.value;
 });
 
 const handleSubmit = async () => {
@@ -95,30 +91,21 @@ const handleSubmit = async () => {
     <div class="card">
       <h2 class="title">新規登録</h2>
 
-      <p class="description">
-        アカウントを作成してください。
-      </p>
+      <p class="description">アカウントを作成してください。</p>
 
-      <form
-        class="form"
-        @submit.prevent="handleSubmit"
-        autocomplete="off"
-      >
+      <form class="form" autocomplete="off" @submit.prevent="handleSubmit">
         <div class="form-group">
           <label>名前</label>
 
           <input
+            v-model="name"
             name="signup_name_input"
             type="text"
-            v-model="name"
             placeholder="田中 太郎"
             autocomplete="off"
           />
 
-          <p
-            v-if="isSubmitted && nameError"
-            class="error"
-          >
+          <p v-if="isSubmitted && nameError" class="error">
             {{ nameError }}
           </p>
         </div>
@@ -127,17 +114,14 @@ const handleSubmit = async () => {
           <label>メールアドレス</label>
 
           <input
+            v-model="email"
             name="signup_email_input"
             type="email"
-            v-model="email"
             placeholder="test@example.com"
             autocomplete="off"
           />
 
-          <p
-            v-if="isSubmitted && emailError"
-            class="error"
-          >
+          <p v-if="isSubmitted && emailError" class="error">
             {{ emailError }}
           </p>
         </div>
@@ -147,9 +131,9 @@ const handleSubmit = async () => {
 
           <div class="password-wrapper">
             <input
+              v-model="password"
               name="signup_password_input"
               :type="isPasswordVisible ? 'text' : 'password'"
-              v-model="password"
               placeholder="********"
               autocomplete="new-password"
             />
@@ -163,10 +147,7 @@ const handleSubmit = async () => {
             </button>
           </div>
 
-          <p
-            v-if="isSubmitted && passwordError"
-            class="error"
-          >
+          <p v-if="isSubmitted && passwordError" class="error">
             {{ passwordError }}
           </p>
         </div>
@@ -176,13 +157,9 @@ const handleSubmit = async () => {
 
           <div class="password-wrapper">
             <input
-              name="signup_password_confirmation_input"
-              :type="
-                isPasswordConfirmationVisible
-                  ? 'text'
-                  : 'password'
-              "
               v-model="passwordConfirmation"
+              name="signup_password_confirmation_input"
+              :type="isPasswordConfirmationVisible ? 'text' : 'password'"
               placeholder="********"
               autocomplete="new-password"
             />
@@ -191,33 +168,18 @@ const handleSubmit = async () => {
               type="button"
               class="toggle-button"
               @click="
-                isPasswordConfirmationVisible =
-                  !isPasswordConfirmationVisible
+                isPasswordConfirmationVisible = !isPasswordConfirmationVisible
               "
             >
-              {{
-                isPasswordConfirmationVisible
-                  ? "非表示"
-                  : "表示"
-              }}
+              {{ isPasswordConfirmationVisible ? "非表示" : "表示" }}
             </button>
           </div>
         </div>
 
         <div class="button-group">
-          <button
-            class="signup-button"
-            type="submit"
-          >
-            新規登録
-          </button>
+          <button class="signup-button" type="submit">新規登録</button>
 
-          <button
-            class="cancel-button"
-            type="button"
-          >
-            キャンセル
-          </button>
+          <button class="cancel-button" type="button">キャンセル</button>
         </div>
       </form>
     </div>
@@ -225,137 +187,137 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
-    .container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: v-bind('theme.colors.background');
-    padding: v-bind('theme.spacing.xl');
-    }
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: v-bind("theme.colors.background");
+  padding: v-bind("theme.spacing.xl");
+}
 
-    .card {
-    width: 100%;
-    max-width: 420px;
-    background-color: white;
-    border-radius: v-bind('theme.borderRadius.lg');
-    padding: v-bind('theme.spacing.xxl');
-    border: 1px solid v-bind('theme.colors.borderLight');
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
+.card {
+  width: 100%;
+  max-width: 420px;
+  background-color: white;
+  border-radius: v-bind("theme.borderRadius.lg");
+  padding: v-bind("theme.spacing.xxl");
+  border: 1px solid v-bind("theme.colors.borderLight");
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
 
-    .title {
-    font-size: v-bind("theme.fontSize['2xl']");
-    font-weight: bold;
-    margin-bottom: v-bind('theme.spacing.sm');
-    color: v-bind('theme.colors.textPrimary');
-    }
+.title {
+  font-size: v-bind("theme.fontSize['2xl']");
+  font-weight: bold;
+  margin-bottom: v-bind("theme.spacing.sm");
+  color: v-bind("theme.colors.textPrimary");
+}
 
-    .description {
-    color: v-bind('theme.colors.textSecondary');
-    margin-bottom: v-bind('theme.spacing.xl');
-    font-size: v-bind('theme.fontSize.base');
-    }
+.description {
+  color: v-bind("theme.colors.textSecondary");
+  margin-bottom: v-bind("theme.spacing.xl");
+  font-size: v-bind("theme.fontSize.base");
+}
 
-    .form {
-    display: flex;
-    flex-direction: column;
-    gap: v-bind('theme.spacing.lg');
-    }
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: v-bind("theme.spacing.lg");
+}
 
-    .form-group {
-    display: flex;
-    flex-direction: column;
-    }
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
 
-    .form-group label {
-    margin-bottom: v-bind('theme.spacing.sm');
-    font-size: v-bind('theme.fontSize.base');
-    font-weight: 600;
-    color: v-bind('theme.colors.textPrimary');
-    }
+.form-group label {
+  margin-bottom: v-bind("theme.spacing.sm");
+  font-size: v-bind("theme.fontSize.base");
+  font-weight: 600;
+  color: v-bind("theme.colors.textPrimary");
+}
 
-    .form-group input {
-    width: 100%;
-    height: 44px;
-    border: 1px solid v-bind('theme.colors.border');
-    border-radius: v-bind('theme.borderRadius.md');
-    padding: 0 48px 0 v-bind('theme.spacing.md');
-    font-size: v-bind('theme.fontSize.base');
-    transition: all v-bind('theme.transition.base');
-    background-color: white;
-    box-sizing: border-box;
-    }
+.form-group input {
+  width: 100%;
+  height: 44px;
+  border: 1px solid v-bind("theme.colors.border");
+  border-radius: v-bind("theme.borderRadius.md");
+  padding: 0 48px 0 v-bind("theme.spacing.md");
+  font-size: v-bind("theme.fontSize.base");
+  transition: all v-bind("theme.transition.base");
+  background-color: white;
+  box-sizing: border-box;
+}
 
-    .form-group input:focus {
-    outline: none;
-    border-color: v-bind('theme.colors.primary');
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
-    }
+.form-group input:focus {
+  outline: none;
+  border-color: v-bind("theme.colors.primary");
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
+}
 
-    .password-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    }
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
 
-    .password-wrapper input {
-    width: 100%;
-    }
+.password-wrapper input {
+  width: 100%;
+}
 
-    .toggle-button {
-    position: absolute;
-    right: 12px;
-    background: none;
-    border: none;
-    color: v-bind('theme.colors.primary');
-    cursor: pointer;
-    font-size: v-bind('theme.fontSize.sm');
-    }
+.toggle-button {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: v-bind("theme.colors.primary");
+  cursor: pointer;
+  font-size: v-bind("theme.fontSize.sm");
+}
 
-    .toggle-button:hover {
-    opacity: 0.7;
-    }
+.toggle-button:hover {
+  opacity: 0.7;
+}
 
-    .error {
-    margin-top: 6px;
-    color: v-bind('theme.colors.danger');
-    font-size: v-bind('theme.fontSize.sm');
-    }
+.error {
+  margin-top: 6px;
+  color: v-bind("theme.colors.danger");
+  font-size: v-bind("theme.fontSize.sm");
+}
 
-    .button-group {
-    display: flex;
-    gap: v-bind('theme.spacing.md');
-    margin-top: v-bind('theme.spacing.sm');
-    }
+.button-group {
+  display: flex;
+  gap: v-bind("theme.spacing.md");
+  margin-top: v-bind("theme.spacing.sm");
+}
 
-    .signup-button,
-    .cancel-button {
-    flex: 1;
-    height: 44px;
-    border: none;
-    border-radius: v-bind('theme.borderRadius.md');
-    font-size: v-bind('theme.fontSize.base');
-    font-weight: bold;
-    cursor: pointer;
-    transition: all v-bind('theme.transition.base');
-    }
+.signup-button,
+.cancel-button {
+  flex: 1;
+  height: 44px;
+  border: none;
+  border-radius: v-bind("theme.borderRadius.md");
+  font-size: v-bind("theme.fontSize.base");
+  font-weight: bold;
+  cursor: pointer;
+  transition: all v-bind("theme.transition.base");
+}
 
-    .signup-button {
-    background-color: v-bind('theme.colors.primary');
-    color: white;
-    }
+.signup-button {
+  background-color: v-bind("theme.colors.primary");
+  color: white;
+}
 
-    .signup-button:hover {
-    background-color: v-bind('theme.colors.primaryHover');
-    }
+.signup-button:hover {
+  background-color: v-bind("theme.colors.primaryHover");
+}
 
-    .cancel-button {
-    background-color: v-bind('theme.colors.backgroundDark');
-    color: v-bind('theme.colors.textPrimary');
-    }
+.cancel-button {
+  background-color: v-bind("theme.colors.backgroundDark");
+  color: v-bind("theme.colors.textPrimary");
+}
 
-    .cancel-button:hover {
-    background-color: v-bind('theme.colors.borderLight');
-    }
+.cancel-button:hover {
+  background-color: v-bind("theme.colors.borderLight");
+}
 </style>
