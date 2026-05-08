@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { login } from "../service/login";
+import { authService } from "../service/authService";
 import { theme } from "../styles/theme";
 import { useRouter } from "vue-router";
+import { useAuth } from "../composables/useAuth";
 
 
 const email = ref<string>("");
 const password = ref<string>("");
 const router = useRouter();
 
+const { setLogin } = useAuth()
+
 const handleLogin = async () => {
+  const { loginService } = authService()
   try {
-    const res = await login({
+    const res = await loginService({
       email: email.value,
       password: password.value,
     });
@@ -20,7 +24,7 @@ const handleLogin = async () => {
     localStorage.setItem("user", JSON.stringify(user));
 
     const token = res?.token;
-    localStorage.setItem("token", token);
+    setLogin(token);
 
     console.log("login success");
     router.push("/");

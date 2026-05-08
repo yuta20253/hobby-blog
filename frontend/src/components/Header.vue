@@ -1,19 +1,20 @@
 <script setup lang="ts">
-    import { ref, onMounted } from 'vue';
-    import { useRouter } from 'vue-router';
+    import { onMounted } from 'vue';
     import { theme } from '../styles/theme';
+    import { useAuth } from "../composables/useAuth";
+    import { authService } from '../service/authService';
+    import { useRouter } from 'vue-router';
 
-    const router = useRouter();
-
-    const isAuthenticated = ref(false)
+    const { isAuthenticated } = useAuth();
+    const { logoutService } = authService();
+    const router = useRouter()
 
     onMounted(() => {
         isAuthenticated.value = !!localStorage.getItem('token')
     })
 
     const handleLogout = () => {
-        localStorage.removeItem("token");
-        isAuthenticated.value = false;
+        logoutService();
         router.push("/login");
     }
 
