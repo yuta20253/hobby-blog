@@ -2,9 +2,9 @@ package container
 
 import (
 	"gorm.io/gorm"
+	"hobby-blog/internal/handler"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/service"
-	"hobby-blog/internal/handler"
 )
 
 type Container struct {

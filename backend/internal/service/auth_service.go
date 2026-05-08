@@ -1,14 +1,14 @@
 package service
 
 import (
-	"hobby-blog/internal/repository"
+	"hobby-blog/internal/auth"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/pkg/password"
-	"hobby-blog/internal/auth"
+	"hobby-blog/internal/repository"
 )
 
 type AuthService struct {
-	repo  *repository.UserRepository
+	repo *repository.UserRepository
 }
 
 type AuthUserResponse struct {
@@ -18,8 +18,8 @@ type AuthUserResponse struct {
 }
 
 type AuthResult struct {
-	User AuthUserResponse `json:"user"`
-	Token string `json:"token"`
+	User  AuthUserResponse `json:"user"`
+	Token string           `json:"token"`
 }
 
 func NewAuthService(repo *repository.UserRepository) *AuthService {
@@ -34,8 +34,8 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 	}
 
 	user := model.User{
-		Name: name,
-		Email: email,
+		Name:         name,
+		Email:        email,
 		PasswordHash: hashedPassword,
 	}
 
@@ -65,7 +65,7 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 		return nil, err
 	}
 
-	if err := password.Compare(user.PasswordHash, rawPassword) ; err != nil {
+	if err := password.Compare(user.PasswordHash, rawPassword); err != nil {
 		return nil, err
 	}
 
@@ -92,8 +92,8 @@ func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
 	}
 
 	return &AuthUserResponse{
-		ID: user.ID,
-		Name: user.Name,
+		ID:    user.ID,
+		Name:  user.Name,
 		Email: user.Email,
 	}, nil
 }

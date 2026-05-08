@@ -2,8 +2,8 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"hobby-blog/internal/model"
 	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/model"
 )
 
 type PostRepository struct {
@@ -61,11 +61,11 @@ func (r *PostRepository) Get(id uint) (model.Post, error) {
 
 func (r *PostRepository) Create(param post.CreateInput) error {
 	p := model.Post{
-		UserID: param.UserID,
+		UserID:     param.UserID,
 		CategoryID: param.CategoryID,
-		Title: param.Title,
-		Content: param.Content,
-		Status: post.StatusDraft,
+		Title:      param.Title,
+		Content:    param.Content,
+		Status:     post.StatusDraft,
 	}
 
 	return r.db.Create(&p).Error
@@ -76,10 +76,10 @@ func (r *PostRepository) Update(param post.UpdateInput) (model.Post, error) {
 	result := r.db.Model(&model.Post{}).
 		Where("id = ? AND user_id = ?", param.ID, param.UserID).
 		Updates(map[string]interface{}{
-			"title": param.Title,
-			"content": param.Content,
+			"title":       param.Title,
+			"content":     param.Content,
 			"category_id": param.CategoryID,
-			"status": param.Status,
+			"status":      param.Status,
 		})
 
 	if result.Error != nil {

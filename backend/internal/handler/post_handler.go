@@ -1,12 +1,12 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"hobby-blog/internal/service"
-	"hobby-blog/internal/domain/post"
-	"strconv"
 	"errors"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/service"
+	"strconv"
 )
 
 type PostHandler struct {
@@ -22,9 +22,9 @@ type PostSearchQuery struct {
 }
 
 type CreatePostRequest struct {
-	Title string `json:"title" binding:"required,max=255"`
-	Content string `json:"content" binding:"required"`
-	CategoryID uint `json:"category_id" binding:"required"`
+	Title      string `json:"title" binding:"required,max=255"`
+	Content    string `json:"content" binding:"required"`
+	CategoryID uint   `json:"category_id" binding:"required"`
 }
 
 type UpdatePostRequest struct {
@@ -46,21 +46,21 @@ func (q PostSearchQuery) ToDomain() post.SearchQuery {
 
 func (r CreatePostRequest) ToDomain(userID uint) post.CreateInput {
 	return post.CreateInput{
-		Title: r.Title,
-		Content: r.Content,
+		Title:      r.Title,
+		Content:    r.Content,
 		CategoryID: r.CategoryID,
-		UserID: userID,
+		UserID:     userID,
 	}
 }
 
 func (r UpdatePostRequest) ToDomain(id uint, userID uint) post.UpdateInput {
 	return post.UpdateInput{
-		ID: id,
-		Title: r.Title,
-		Content: r.Content,
+		ID:         id,
+		Title:      r.Title,
+		Content:    r.Content,
 		CategoryID: r.CategoryID,
-		UserID: userID,
-		Status: r.Status,
+		UserID:     userID,
+		Status:     r.Status,
 	}
 }
 
@@ -120,7 +120,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 	})
 }
 
-func (h *PostHandler)Create(c *gin.Context) {
+func (h *PostHandler) Create(c *gin.Context) {
 	var req CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -149,7 +149,7 @@ func (h *PostHandler)Create(c *gin.Context) {
 	err := h.service.CreatePost(req.ToDomain(uint(id)))
 
 	if err != nil {
-		c.JSON(500, gin.H{ "error": "failed" })
+		c.JSON(500, gin.H{"error": "failed"})
 		return
 	}
 
@@ -173,21 +173,21 @@ func (h *PostHandler) Update(c *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		c.JSON(400, gin.H{ "error": "invalid id" })
+		c.JSON(400, gin.H{"error": "invalid id"})
 		return
 	}
 
 	userID, exists := c.Get("userID")
 
 	if !exists {
-		c.JSON(401, gin.H{ "error": "unauthorized" })
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	uid, ok := userID.(uint)
 
 	if !ok {
-		c.JSON(500, gin.H{ "error": "failed" })
+		c.JSON(500, gin.H{"error": "failed"})
 		return
 	}
 
@@ -199,7 +199,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 			return
 		}
 
-		c.JSON(500, gin.H{ "error": "failed" })
+		c.JSON(500, gin.H{"error": "failed"})
 		return
 	}
 
@@ -214,14 +214,14 @@ func (h *PostHandler) Delete(c *gin.Context) {
 	id, err := strconv.Atoi(idStr)
 
 	if err != nil {
-		c.JSON(400, gin.H{ "error": "invalid id" })
+		c.JSON(400, gin.H{"error": "invalid id"})
 		return
 	}
 
 	userID, exists := c.Get("userID")
 
 	if !exists {
-		c.JSON(401, gin.H{ "error": "unauthorized" })
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
 
@@ -243,5 +243,5 @@ func (h *PostHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{ "message": "success delete post" })
+	c.JSON(200, gin.H{"message": "success delete post"})
 }

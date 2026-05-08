@@ -1,9 +1,9 @@
 package auth
 
 import (
-	"time"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
+	"time"
 )
 
 var secretKey = []byte("my-secret-key")
@@ -20,7 +20,7 @@ func GenerateToken(userID uint) (string, error) {
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt: jwt.NewNumericDate(time.Now()),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
 

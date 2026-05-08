@@ -18,12 +18,12 @@ type CreateInput struct {
 type Status string
 
 const (
-	StatusDraft Status = "draft"
+	StatusDraft     Status = "draft"
 	StatusPublished Status = "published"
 )
 
 type UpdateInput struct {
-	ID 		   uint
+	ID         uint
 	Title      string
 	Content    string
 	CategoryID uint

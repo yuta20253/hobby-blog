@@ -1,9 +1,9 @@
 package service
 
 import (
-	"hobby-blog/internal/repository"
-	"hobby-blog/internal/domain/post"
 	"errors"
+	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/repository"
 )
 
 type PostService struct {
@@ -11,7 +11,7 @@ type PostService struct {
 }
 
 type PostResponse struct {
-	ID uint `json:"id"`
+	ID    uint   `json:"id"`
 	Title string `json:"title"`
 }
 
@@ -26,10 +26,10 @@ type CategoryResponse struct {
 }
 
 type PostDetailResponse struct {
-	ID uint `json:"id"`
-	Title string `json:"title"`
-	Content string `json:"content"`
-	User PostUserResponse `json:"user"`
+	ID       uint             `json:"id"`
+	Title    string           `json:"title"`
+	Content  string           `json:"content"`
+	User     PostUserResponse `json:"user"`
 	Category CategoryResponse `json:"category"`
 }
 
@@ -48,7 +48,7 @@ func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
 
 	for _, p := range posts {
 		res = append(res, PostResponse{
-			ID: p.ID,
+			ID:    p.ID,
 			Title: p.Title,
 		})
 	}
@@ -64,15 +64,15 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 	}
 
 	return &PostDetailResponse{
-		ID: post.ID,
-		Title: post.Title,
+		ID:      post.ID,
+		Title:   post.Title,
 		Content: post.Content,
 		User: PostUserResponse{
-			ID: post.User.ID,
+			ID:   post.User.ID,
 			Name: post.User.Name,
 		},
 		Category: CategoryResponse{
-			ID: post.Category.ID,
+			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
 	}, nil
@@ -89,7 +89,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		return nil, err
 	}
 
-	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft{
+	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
 		return nil, errors.New("invalid status transition")
 	}
 
@@ -100,15 +100,15 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 	}
 
 	return &PostDetailResponse{
-		ID: post.ID,
-		Title: post.Title,
+		ID:      post.ID,
+		Title:   post.Title,
 		Content: post.Content,
 		User: PostUserResponse{
-			ID: post.User.ID,
+			ID:   post.User.ID,
 			Name: post.User.Name,
 		},
 		Category: CategoryResponse{
-			ID: post.Category.ID,
+			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
 	}, nil

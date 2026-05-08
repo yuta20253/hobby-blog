@@ -5,19 +5,18 @@ import (
 	"hobby-blog/internal/service"
 )
 
-
 type AuthHandler struct {
 	service *service.AuthService
 }
 
 type SignUpRequest struct {
-	Name string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 type LoginRequest struct {
-	Email string `json:"email"`
+	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
@@ -30,7 +29,7 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 func (h *AuthHandler) SignUp(c *gin.Context) {
 	var req SignUpRequest
 
-	if err := c.ShouldBindJSON(&req) ;err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": "invalid request"})
 		return
 	}
@@ -59,13 +58,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	}
 
 	result, err := h.service.Login(req.Email, req.Password)
-	if (err != nil) {
+	if err != nil {
 		c.JSON(401, gin.H{"error": "invalid credentials"})
 		return
 	}
 
 	c.JSON(200, gin.H{
-		"user": result.User,
+		"user":  result.User,
 		"token": result.Token,
 	})
 }
