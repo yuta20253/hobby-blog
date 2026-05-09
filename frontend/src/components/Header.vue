@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { theme } from "../styles/theme";
 import { useAuth } from "../composables/useAuth";
-import { authService } from "../service/authService";
+import { authService } from "../service/auth/authService";
 import { useRouter } from "vue-router";
 
 const { isAuthenticated } = useAuth();
