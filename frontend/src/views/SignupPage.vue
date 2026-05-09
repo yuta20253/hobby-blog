@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { authService } from "../service/authService";
+import { authService } from "../service/auth/authService";
 import { theme } from "../styles/theme";
 import { computed, ref } from "vue";
 import { useAuth } from "../composables/useAuth";

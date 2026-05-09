@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useAuth } from "../composables/useAuth";
-import type { User } from "../types/user";
+import { useAuth } from "../../composables/useAuth";
+import type { User } from "../../types/user";
 
 type Login = {
   email: string;

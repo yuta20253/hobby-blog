@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { authService } from "../service/authService";
+import { authService } from "../service/auth/authService";
 import { theme } from "../styles/theme";
 import { useRouter } from "vue-router";
 import { useAuth } from "../composables/useAuth";
