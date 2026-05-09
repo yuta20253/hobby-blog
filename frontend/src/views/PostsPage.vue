@@ -12,38 +12,53 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    <h2>投稿一覧</h2>
+  <div class="container">
+    <h2 class="title">投稿一覧</h2>
+
     <div class="card">
-      <div
+      <RouterLink
         v-for="post in posts"
         :key="post.id"
         class="card-content"
+        :to="`/posts/${post.id}`"
       >
-        <div>
-          {{ post.title }}
-          <button class="post-detail-button">詳細</button>
+        <div class="post-row">
+          <p class="post-title">{{ post.title }}</p>
         </div>
-      </div>
+      </RouterLink>
     </div>
+
+    <p v-if="posts.length === 0" class="empty">投稿がありません</p>
   </div>
 </template>
 
 <style scoped>
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: v-bind("theme.spacing.xl");
+}
+
+.title {
+  font-size: v-bind("theme.fontSize['2xl']");
+  font-weight: bold;
+  margin-bottom: v-bind("theme.spacing.lg");
+  color: v-bind("theme.colors.textPrimary");
+}
+
 .card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 16px;
+  gap: v-bind("theme.spacing.md");
 }
 
 .card-content {
-  padding: 16px;
-  border-radius: v-bind('theme.borderRadius.md');
+  padding: v-bind("theme.spacing.md");
+  border-radius: v-bind("theme.borderRadius.md");
   transition: all 0.2s ease;
-  background-color: v-bind('theme.colors.background');
-  border: 1px solid v-bind('theme.colors.border');
-  box-shadow: none;
+  background-color: v-bind("theme.colors.background");
+  border: 1px solid v-bind("theme.colors.border");
+  text-decoration: none;
 }
 
 .card-content:hover {
@@ -51,24 +66,22 @@ onMounted(async () => {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
-.card-content > div {
+.post-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: v-bind("theme.spacing.md");
 }
 
-.post-detail-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: v-bind('theme.borderRadius.sm');
-  background-color: v-bind('theme.colors.primary');
-  color: white;
-  font-size: v-bind('theme.fontSize.sm');
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+.post-title {
+  font-size: v-bind("theme.fontSize.base");
+  font-weight: 600;
+  color: v-bind("theme.colors.textPrimary");
 }
 
-.post-detail-button:hover {
-  background-color: v-bind('theme.colors.primaryHover');
+.empty {
+  margin-top: v-bind("theme.spacing.lg");
+  color: v-bind("theme.colors.textSecondary");
+  text-align: center;
 }
 </style>
