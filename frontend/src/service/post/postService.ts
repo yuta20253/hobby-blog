@@ -11,15 +11,9 @@ type PostDetailResponse = {
 
 export const useFetchPosts = async (): Promise<Post[]> => {
   try {
-    const token = localStorage.getItem("token");
     const url = import.meta.env.VITE_API_URL + "/api/posts";
 
-    const res = await axios.get<PostsResponse>(url, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get<PostsResponse>(url);
 
     return res.data.posts;
   } catch (error) {
@@ -30,15 +24,9 @@ export const useFetchPosts = async (): Promise<Post[]> => {
 
 export const useFetchPost = async (id: number): Promise<PostDetail> => {
   try {
-    const token = localStorage.getItem("token");
     const url = import.meta.env.VITE_API_URL + `/api/posts/${id}`;
 
-    const res = await axios.get<PostDetailResponse>(url, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const res = await axios.get<PostDetailResponse>(url);
 
     return res.data.post;
   } catch (error) {
