@@ -1,12 +1,12 @@
 import axios from "axios";
-import type { Post, PostDetail } from "../../types/post";
+import type { Post } from "../../types/post";
 
 type PostsResponse = {
   posts: Post[];
 };
 
 type PostDetailResponse = {
-  post: PostDetail;
+  post: Post;
 };
 
 export const useFetchPosts = async (): Promise<Post[]> => {
@@ -22,7 +22,7 @@ export const useFetchPosts = async (): Promise<Post[]> => {
   }
 };
 
-export const useFetchPost = async (id: number): Promise<PostDetail> => {
+export const useFetchPost = async (id: number): Promise<Post> => {
   try {
     const url = import.meta.env.VITE_API_URL + `/api/posts/${id}`;
 

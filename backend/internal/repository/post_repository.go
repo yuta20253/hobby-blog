@@ -44,7 +44,7 @@ func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 		Offset(q.Offset).
 		Order("posts.created_at DESC")
 
-	err := query.Find(&posts).Error
+	err := query.Preload("User").Preload("Category").Find(&posts).Error
 
 	if err != nil {
 		return nil, err

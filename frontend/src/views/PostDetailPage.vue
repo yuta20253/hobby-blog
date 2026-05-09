@@ -2,11 +2,11 @@
 import { onMounted, ref } from "vue";
 import { theme } from "../styles/theme";
 import { useFetchPost } from "../service/post/postService";
-import type { PostDetail } from "../types/post";
+import type { Post } from "../types/post";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 
-const post = ref<PostDetail | null>(null);
+const post = ref<Post | null>(null);
 const route = useRoute();
 const router = useRouter();
 

@@ -13,6 +13,8 @@ type PostService struct {
 type PostResponse struct {
 	ID    uint   `json:"id"`
 	Title string `json:"title"`
+	User     PostUserResponse `json:"user"`
+	Category CategoryResponse `json:"category"`
 }
 
 type PostUserResponse struct {
@@ -51,6 +53,15 @@ func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
 		res = append(res, PostResponse{
 			ID:    p.ID,
 			Title: p.Title,
+			User: PostUserResponse{
+				ID:    p.User.ID,
+				Name:  p.User.Name,
+				Email: p.User.Email,
+			},
+			Category: CategoryResponse{
+				ID: p.Category.ID,
+				Name: p.Category.Name,
+			},
 		})
 	}
 
