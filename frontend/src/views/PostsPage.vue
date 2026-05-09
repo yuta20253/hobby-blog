@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { fetchPosts } from "../service/post/postService";
+import { useFetchPosts } from "../service/post/postService";
 import type { Post } from "../types/post";
 import { theme } from "../styles/theme";
 
 const posts = ref<Post[]>([]);
 
 onMounted(async () => {
-  posts.value = await fetchPosts();
+  posts.value = await useFetchPosts();
 });
 </script>
 
