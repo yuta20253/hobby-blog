@@ -11,15 +11,15 @@ type PostService struct {
 }
 
 type PostResponse struct {
-	ID    uint   `json:"id"`
-	Title string `json:"title"`
+	ID       uint             `json:"id"`
+	Title    string           `json:"title"`
 	User     PostUserResponse `json:"user"`
 	Category CategoryResponse `json:"category"`
 }
 
 type PostUserResponse struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	ID    uint   `json:"id"`
+	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
@@ -59,7 +59,7 @@ func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
 				Email: p.User.Email,
 			},
 			Category: CategoryResponse{
-				ID: p.Category.ID,
+				ID:   p.Category.ID,
 				Name: p.Category.Name,
 			},
 		})
@@ -80,8 +80,8 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		Title:   post.Title,
 		Content: post.Content,
 		User: PostUserResponse{
-			ID:   post.User.ID,
-			Name: post.User.Name,
+			ID:    post.User.ID,
+			Name:  post.User.Name,
 			Email: post.User.Email,
 		},
 		Category: CategoryResponse{
