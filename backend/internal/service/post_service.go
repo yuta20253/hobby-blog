@@ -18,6 +18,7 @@ type PostResponse struct {
 type PostUserResponse struct {
 	ID   uint   `json:"id"`
 	Name string `json:"name"`
+	Email string `json:"email"`
 }
 
 type CategoryResponse struct {
@@ -70,6 +71,7 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		User: PostUserResponse{
 			ID:   post.User.ID,
 			Name: post.User.Name,
+			Email: post.User.Email,
 		},
 		Category: CategoryResponse{
 			ID:   post.Category.ID,
