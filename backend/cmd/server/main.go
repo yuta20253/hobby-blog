@@ -15,6 +15,7 @@ func main() {
 	r := router.SetUpRouter(
 		c.AuthHandler,
 		c.PostHandler,
+		c.MypageHandler,
 	)
 
 	if err := r.Run(":8080"); err != nil {

@@ -8,8 +8,9 @@ import (
 )
 
 type Container struct {
-	AuthHandler *handler.AuthHandler
-	PostHandler *handler.PostHandler
+	AuthHandler   *handler.AuthHandler
+	PostHandler   *handler.PostHandler
+	MypageHandler *handler.MypageHandler
 }
 
 func NewContainer(db *gorm.DB) *Container {
@@ -21,8 +22,12 @@ func NewContainer(db *gorm.DB) *Container {
 	postService := service.NewPostService(postRepo)
 	postHandler := handler.NewPostHandler(postService)
 
+	mypageService := service.NewMypageService(userRepo, postRepo)
+	mypageHandler := handler.NewMypageHandler(mypageService)
+
 	return &Container{
-		AuthHandler: authHandler,
-		PostHandler: postHandler,
+		AuthHandler:   authHandler,
+		PostHandler:   postHandler,
+		MypageHandler: mypageHandler,
 	}
 }

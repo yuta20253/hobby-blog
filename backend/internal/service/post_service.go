@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/dto"
 	"hobby-blog/internal/repository"
 )
 
@@ -10,55 +11,37 @@ type PostService struct {
 	repo *repository.PostRepository
 }
 
-type PostResponse struct {
-	ID       uint             `json:"id"`
-	Title    string           `json:"title"`
-	User     PostUserResponse `json:"user"`
-	Category CategoryResponse `json:"category"`
-}
-
-type PostUserResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
-type CategoryResponse struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-}
-
 type PostDetailResponse struct {
-	ID       uint             `json:"id"`
-	Title    string           `json:"title"`
-	Content  string           `json:"content"`
-	User     PostUserResponse `json:"user"`
-	Category CategoryResponse `json:"category"`
+	ID       uint                 `json:"id"`
+	Title    string               `json:"title"`
+	Content  string               `json:"content"`
+	User     dto.PostUserResponse `json:"user"`
+	Category dto.CategoryResponse `json:"category"`
 }
 
 func NewPostService(repo *repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
+func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error) {
 	posts, err := s.repo.Search(q)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]PostResponse, 0, len(posts))
+	res := make([]dto.PostResponse, 0, len(posts))
 
 	for _, p := range posts {
-		res = append(res, PostResponse{
+		res = append(res, dto.PostResponse{
 			ID:    p.ID,
 			Title: p.Title,
-			User: PostUserResponse{
+			User: dto.PostUserResponse{
 				ID:    p.User.ID,
 				Name:  p.User.Name,
 				Email: p.User.Email,
 			},
-			Category: CategoryResponse{
+			Category: dto.CategoryResponse{
 				ID:   p.Category.ID,
 				Name: p.Category.Name,
 			},
@@ -79,12 +62,12 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: PostUserResponse{
+		User: dto.PostUserResponse{
 			ID:    post.User.ID,
 			Name:  post.User.Name,
 			Email: post.User.Email,
 		},
-		Category: CategoryResponse{
+		Category: dto.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
@@ -116,11 +99,11 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: PostUserResponse{
+		User: dto.PostUserResponse{
 			ID:   post.User.ID,
 			Name: post.User.Name,
 		},
-		Category: CategoryResponse{
+		Category: dto.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},

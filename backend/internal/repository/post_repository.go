@@ -110,3 +110,13 @@ func (r *PostRepository) Delete(id uint, userID uint) error {
 
 	return nil
 }
+
+func (r *PostRepository) GetMyPostsByUserID(userID uint) ([]model.Post, error) {
+	var posts []model.Post
+	result := r.db.Preload("Category").Where("user_id = ?", userID).Find(&posts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return posts, nil
+}
