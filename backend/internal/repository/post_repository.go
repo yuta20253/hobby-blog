@@ -120,3 +120,14 @@ func (r *PostRepository) GetMyPostsByUserID(userID uint) ([]model.Post, error) {
 	}
 	return posts, nil
 }
+
+func (r *PostRepository) FindByID(postID int) (model.Post, error) {
+	var post model.Post
+	err := r.db.First(&post, postID).Error
+
+	if err != nil {
+		return model.Post{}, err
+	}
+
+	return post, nil
+}

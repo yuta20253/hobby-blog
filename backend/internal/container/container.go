@@ -11,6 +11,7 @@ type Container struct {
 	AuthHandler   *handler.AuthHandler
 	PostHandler   *handler.PostHandler
 	MypageHandler *handler.MypageHandler
+	MediaHandler  *handler.MediaHandler
 }
 
 func NewContainer(db *gorm.DB) *Container {
@@ -25,9 +26,14 @@ func NewContainer(db *gorm.DB) *Container {
 	mypageService := service.NewMypageService(userRepo, postRepo)
 	mypageHandler := handler.NewMypageHandler(mypageService)
 
+	mediaRepo := repository.NewMediaRepository(db)
+	mediaService := service.NewMediaService(postRepo, mediaRepo)
+	mediaHandler := handler.NewMediaHandler(mediaService)
+
 	return &Container{
 		AuthHandler:   authHandler,
 		PostHandler:   postHandler,
 		MypageHandler: mypageHandler,
+		MediaHandler:  mediaHandler,
 	}
 }

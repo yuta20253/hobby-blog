@@ -16,6 +16,7 @@ func main() {
 		c.AuthHandler,
 		c.PostHandler,
 		c.MypageHandler,
+		c.MediaHandler,
 	)
 
 	if err := r.Run(":8080"); err != nil {

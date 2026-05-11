@@ -13,6 +13,7 @@ func SetUpRouter(
 	authHandler *handler.AuthHandler,
 	postHandler *handler.PostHandler,
 	mypageHandler *handler.MypageHandler,
+	mediaHandler *handler.MediaHandler,
 ) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -69,6 +70,8 @@ func SetUpRouter(
 	postsPrivate.POST("", postHandler.Create)
 	postsPrivate.PATCH("/:id", postHandler.Update)
 	postsPrivate.DELETE("/:id", postHandler.Delete)
+
+	postsPrivate.POST("/:id/media", mediaHandler.UploadMedia)
 
 	mypage := private.Group("")
 	mypage.GET("/mypage", mypageHandler.Show)
