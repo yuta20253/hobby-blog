@@ -14,11 +14,12 @@ type PostService struct {
 }
 
 type PostDetailResponse struct {
-	ID       uint                 `json:"id"`
-	Title    string               `json:"title"`
-	Content  string               `json:"content"`
-	User     dto.PostUserResponse `json:"user"`
-	Category dto.CategoryResponse `json:"category"`
+	ID         uint                    `json:"id"`
+	Title      string                  `json:"title"`
+	Content    string                  `json:"content"`
+	User       dto.PostUserResponse    `json:"user"`
+	Category   dto.CategoryResponse    `json:"category"`
+	MediaFiles []dto.MediaFileResponse `json:"media_files"`
 }
 
 func NewPostService(repo repository.PostRepository) *PostService {
@@ -34,19 +35,20 @@ func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error
 
 	res := make([]dto.PostResponse, 0, len(posts))
 
-	for _, p := range posts {
+	for _, post := range posts {
 		res = append(res, dto.PostResponse{
-			ID:    p.ID,
-			Title: p.Title,
+			ID:    post.ID,
+			Title: post.Title,
 			User: dto.PostUserResponse{
-				ID:    p.User.ID,
-				Name:  p.User.Name,
-				Email: p.User.Email,
+				ID:    post.User.ID,
+				Name:  post.User.Name,
+				Email: post.User.Email,
 			},
 			Category: dto.CategoryResponse{
-				ID:   p.Category.ID,
-				Name: p.Category.Name,
+				ID:   post.Category.ID,
+				Name: post.Category.Name,
 			},
+			MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 		})
 	}
 
@@ -76,6 +78,7 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
+		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 
@@ -115,6 +118,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
+		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 

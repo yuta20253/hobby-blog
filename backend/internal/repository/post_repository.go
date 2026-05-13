@@ -54,7 +54,7 @@ func (r *postRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 		Offset(q.Offset).
 		Order("posts.created_at DESC")
 
-	err := query.Preload("User").Preload("Category").Find(&posts).Error
+	err := query.Preload("User").Preload("Category").Preload("MediaFiles").Find(&posts).Error
 
 	if err != nil {
 		return nil, err
@@ -65,7 +65,7 @@ func (r *postRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 
 func (r *postRepository) Get(id uint) (model.Post, error) {
 	var post model.Post
-	err := r.db.Preload("User").Preload("Category").First(&post, id).Error
+	err := r.db.Preload("User").Preload("Category").Preload("MediaFiles").First(&post, id).Error
 	return post, err
 }
 
