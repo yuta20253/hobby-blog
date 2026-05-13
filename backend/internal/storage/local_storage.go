@@ -23,7 +23,9 @@ func (s *LocalStorage) Save(reader io.Reader, filename string) (string, error) {
 		return "", err
 	}
 
-	filePath := filepath.Join(s.basePath, s.generateFileName(filename))
+	safeName := filepath.Base(filename)
+
+	filePath := filepath.Join(s.basePath, safeName)
 
 	dst, err := os.Create(filePath)
 	if err != nil {

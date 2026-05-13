@@ -10,6 +10,7 @@ import (
 )
 
 func SetUpRouter(
+	cfg *config.Config
 	authHandler *handler.AuthHandler,
 	postHandler *handler.PostHandler,
 	mypageHandler *handler.MypageHandler,
@@ -17,9 +18,7 @@ func SetUpRouter(
 ) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost:5173",
-		},
+		AllowOrigins: config.CORS_ALLOW_ORIGINS,
 
 		AllowMethods: []string{
 			"GET",

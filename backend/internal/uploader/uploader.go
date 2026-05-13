@@ -50,9 +50,15 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 		return "", "", err
 	}
 
-	path, err := u.storage.Save(f, file.Filename)
+	ext := filepath.Ext(file.Filename)
+	if err == "" {
+		return "", "", appErrors.ErrUnsupportedMedia
+	}
+
+	filename := uuid.New().String() + ext
+
+	path, err := u.storage.Save(f, filename)
 	if err != nil {
-		_ = u.storage.Delete(path)
 		return "", "", err
 	}
 
