@@ -1,10 +1,14 @@
 package service
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"hobby-blog/internal/auth"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/pkg/password"
 	"hobby-blog/internal/repository"
+	"strings"
 )
 
 type AuthService struct {
@@ -40,6 +44,9 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 	}
 
 	if err := s.repo.Create(&user); err != nil {
+		if isDuplicateError(err) {
+			return nil, appErrors.ErrConflict
+		}
 		return nil, err
 	}
 
@@ -62,6 +69,9 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 	user, err := s.repo.FindByEmail(email)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrUnauthorized
+		}
 		return nil, err
 	}
 
@@ -88,6 +98,9 @@ func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
 	user, err := s.repo.FindByID(id)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
 		return nil, err
 	}
 
@@ -96,4 +109,9 @@ func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
 		Name:  user.Name,
 		Email: user.Email,
 	}, nil
+}
+
+func isDuplicateError(err error) bool {
+	// MySQL例（必要に応じて調整）
+	return strings.Contains(err.Error(), "Duplicate entry")
 }

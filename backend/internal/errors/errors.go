@@ -3,8 +3,10 @@ package errors
 import "errors"
 
 var (
-	ErrForbidden        = errors.New("forbidden")
-	ErrUnsupportedMedia = errors.New("unsupported media")
 	ErrNotFound         = errors.New("not found")
-	ErrFileTooLarge     = errors.New("file too large")
+	ErrForbidden        = errors.New("forbidden")
+	ErrUnauthorized     = errors.New("unauthorized")
+	ErrConflict         = errors.New("conflict")
+	ErrInvalidInput     = errors.New("invalid input")
+	ErrUnsupportedMedia = errors.New("unsupported media")
 )

@@ -5,7 +5,6 @@ import (
 	"github.com/gin-gonic/gin"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/service"
-	"strconv"
 )
 
 type MediaHandler struct {
@@ -19,48 +18,37 @@ func NewMediaHandler(service *service.MediaService) *MediaHandler {
 }
 
 func (h *MediaHandler) UploadMedia(c *gin.Context) {
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{"error": "unauthorized"})
-		return
-	}
-
-	uid, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "invalid user id"})
 		return
 	}
 
-	strPostID := c.Param("id")
+	postID, ok := getParamID(c, "id")
 
-	postID, err := strconv.Atoi(strPostID)
-
-	if err != nil {
-		c.JSON(500, gin.H{"error": "invalid id"})
+	if !ok {
 		return
 	}
 
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		c.JSON(400, gin.H{"error": "file required"})
+		respondError(c, 400, "file required")
 		return
 	}
 
-	err = h.service.CreateMedia(uid, uint(postID), file)
+	err = h.service.CreateMedia(uid, postID, file)
 
 	if err != nil {
 		switch {
 		case errors.Is(err, appErrors.ErrForbidden):
-			c.JSON(403, gin.H{"error": "forbidden"})
+			respondError(c, 403, "forbidden")
 		case errors.Is(err, appErrors.ErrUnsupportedMedia):
-			c.JSON(400, gin.H{"error": "unsupported file type"})
+			respondError(c, 400, "unsupported file type")
 		case errors.Is(err, appErrors.ErrNotFound):
-			c.JSON(404, gin.H{"error": "post not found"})
+			respondError(c, 404, "post not found")
 		default:
-			c.JSON(500, gin.H{"error": "failed to save media"})
+			respondError(c, 500, "failed to save media")
 		}
 		return
 	}

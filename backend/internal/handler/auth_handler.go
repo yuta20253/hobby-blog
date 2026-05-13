@@ -30,16 +30,14 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	var req SignUpRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "invalid request"})
+		respondError(c, 400, "invalid request")
 		return
 	}
 
 	result, err := h.service.SignUp(req.Name, req.Email, req.Password)
 
 	if err != nil {
-		c.JSON(500, gin.H{
-			"error": "failed",
-		})
+		respondError(c, 500, "failed")
 		return
 	}
 
@@ -53,13 +51,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": "invalid request"})
+		respondError(c, 400, "invalid request")
 		return
 	}
 
 	result, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "invalid credentials"})
+		respondError(c, 401, "invalid credentials")
 		return
 	}
 
@@ -76,27 +74,15 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{
-			"error": "unauthorized",
-		})
-		return
-	}
-
-	id, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "invalid user id"})
 		return
 	}
 
-	user, err := h.service.GetUserByID(id)
+	user, err := h.service.GetUserByID(uid)
 	if err != nil {
-		c.JSON(404, gin.H{
-			"error": "user not found",
-		})
+		respondError(c, 404, "user not found")
 		return
 	}
 

@@ -2,8 +2,10 @@ package service
 
 import (
 	"errors"
+	"gorm.io/gorm"
 	"hobby-blog/internal/domain/post"
 	"hobby-blog/internal/dto"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/repository"
 )
 
@@ -55,6 +57,9 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 	post, err := s.repo.Get(id)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
 		return nil, err
 	}
 
@@ -82,11 +87,14 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
 		return nil, err
 	}
 
 	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
-		return nil, errors.New("invalid status transition")
+		return nil, appErrors.ErrInvalidInput
 	}
 
 	post, err := s.repo.Update(input)
@@ -111,5 +119,14 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 }
 
 func (s *PostService) DeletePost(id uint, userID uint) error {
-	return s.repo.Delete(id, userID)
+	err := s.repo.Delete(id, userID)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return appErrors.ErrNotFound
+		}
+		return err
+	}
+
+	return nil
 }

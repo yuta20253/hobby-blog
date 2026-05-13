@@ -1,8 +1,8 @@
 package storage
 
-import "mime/multipart"
+import "io"
 
 type FileStorage interface {
-	Save(file *multipart.FileHeader) (path string, filename string, err error)
+	Save(reader io.Reader, filename string) (path string, err error)
 	Delete(path string) error
 }

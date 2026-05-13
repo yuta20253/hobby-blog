@@ -2,54 +2,48 @@ package storage
 
 import (
 	"fmt"
-	"mime/multipart"
+	"io"
 	"os"
 	"path/filepath"
 	"time"
 )
 
-type LocalStogare struct {
+type LocalStorage struct {
 	basePath string
 }
 
-func NewLocalStorage(basePath string) *LocalStogare {
-	return &LocalStogare{
+func NewLocalStorage(basePath string) *LocalStorage {
+	return &LocalStorage{
 		basePath: basePath,
 	}
 }
 
-func (s *LocalStogare) Save(file *multipart.FileHeader) (string, string, error) {
+func (s *LocalStorage) Save(reader io.Reader, filename string) (string, error) {
 	if err := os.MkdirAll(s.basePath, 0755); err != nil {
-		return "", "", err
+		return "", err
 	}
 
-	ext := filepath.Ext(file.Filename)
-	fileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	path := "uploads/" + fileName
+	filePath := filepath.Join(s.basePath, s.generateFileName(filename))
 
-	src, err := file.Open()
-
+	dst, err := os.Create(filePath)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
-
-	defer src.Close()
-
-	dst, err := os.Create(path)
-
-	if err != nil {
-		return "", "", err
-	}
-
 	defer dst.Close()
 
-	if _, err := dst.ReadFrom(src); err != nil {
-		return "", "", err
+	if _, err := io.Copy(dst, reader); err != nil {
+		_ = os.Remove(filePath)
+		return "", err
 	}
 
-	return path, fileName, nil
+	return filePath, nil
 }
 
-func (s *LocalStogare) Delete(path string) error {
+func (s *LocalStorage) Delete(path string) error {
 	return os.Remove(path)
+}
+
+func (s *LocalStorage) generateFileName(filename string) string {
+	ext := filepath.Ext(filename)
+	return fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
 }

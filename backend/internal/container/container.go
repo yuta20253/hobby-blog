@@ -7,6 +7,7 @@ import (
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/service"
 	"hobby-blog/internal/storage"
+	"hobby-blog/internal/uploader"
 )
 
 type Container struct {
@@ -33,7 +34,8 @@ func NewContainer(db *gorm.DB) *Container {
 	mediaRepo := repository.NewMediaRepository(db)
 
 	st := storage.NewLocalStorage(cfg.UploadPath)
-	mediaService := service.NewMediaService(postRepo, mediaRepo, st)
+	upl := uploader.NewUploader(st)
+	mediaService := service.NewMediaService(postRepo, mediaRepo, upl)
 	mediaHandler := handler.NewMediaHandler(mediaService)
 
 	return &Container{

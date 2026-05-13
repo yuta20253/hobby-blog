@@ -16,28 +16,16 @@ func NewMypageHandler(service *service.MypageService) *MypageHandler {
 }
 
 func (h *MypageHandler) Show(c *gin.Context) {
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{
-			"error": "unauthorized",
-		})
-		return
-	}
-
-	id, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "invalid user id"})
 		return
 	}
 
-	mypage, err := h.service.GetMyPage(id)
+	mypage, err := h.service.GetMyPage(uid)
 
 	if err != nil {
-		c.JSON(404, gin.H{
-			"error": "mypage not found",
-		})
+		respondError(c, 404, "mypage not found")
 		return
 	}
 

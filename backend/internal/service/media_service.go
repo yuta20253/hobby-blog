@@ -2,34 +2,31 @@ package service
 
 import (
 	stdErrors "errors"
-	"io"
 	"mime/multipart"
-	"net/http"
-	"strings"
+	"path/filepath"
 
 	"gorm.io/gorm"
-	"hobby-blog/internal/domain/media"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/repository"
-	"hobby-blog/internal/storage"
+	"hobby-blog/internal/uploader"
 )
 
 type MediaService struct {
 	postRepo  repository.PostRepository
 	mediaRepo repository.MediaRepository
-	storage   storage.FileStorage
+	uploader  *uploader.Uploader
 }
 
 func NewMediaService(
 	postRepo repository.PostRepository,
 	mediaRepo repository.MediaRepository,
-	storage storage.FileStorage,
+	uploader *uploader.Uploader,
 ) *MediaService {
 	return &MediaService{
 		postRepo:  postRepo,
 		mediaRepo: mediaRepo,
-		storage:   storage,
+		uploader:  uploader,
 	}
 }
 
@@ -46,44 +43,15 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 		return appErrors.ErrForbidden
 	}
 
-	tmp, err := file.Open()
-
+	filePath, mediaType, err := s.uploader.Upload(file)
 	if err != nil {
-		return err
-	}
-
-	defer tmp.Close()
-
-	buffer := make([]byte, 512)
-	n, err := tmp.Read(buffer)
-
-	if err != nil && !stdErrors.Is(err, io.EOF) {
-		return err
-	}
-
-	contentType := http.DetectContentType(buffer[:n])
-
-	var mediaType media.Type
-	switch {
-	case strings.HasPrefix(contentType, "image/"):
-		mediaType = media.TypeImage
-	case strings.HasPrefix(contentType, "video/"):
-		mediaType = media.TypeVideo
-	default:
-		return appErrors.ErrUnsupportedMedia
-	}
-
-	path, fileName, err := s.storage.Save(file)
-
-	if err != nil {
-		_ = s.storage.Delete(path)
 		return err
 	}
 
 	return s.mediaRepo.Create(&model.MediaFile{
-		PostID:   uint(postID),
+		PostID:   postID,
 		Type:     mediaType,
-		FilePath: path,
-		FileName: fileName,
+		FilePath: filePath,
+		FileName: filepath.Base(filePath),
 	})
 }

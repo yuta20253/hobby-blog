@@ -1,7 +1,10 @@
 package service
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"hobby-blog/internal/dto"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/repository"
 )
 
@@ -32,6 +35,10 @@ func (s *MypageService) GetMyPage(id uint) (*MypageResponse, error) {
 	user, err := s.userRepo.FindByID(id)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
+
 		return nil, err
 	}
 
