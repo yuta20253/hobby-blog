@@ -1,54 +1,49 @@
 package service
 
 import (
-	"errors"
-	"fmt"
+	stdErrors "errors"
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
-	"path/filepath"
 	"strings"
-	"time"
 
 	"gorm.io/gorm"
 	"hobby-blog/internal/domain/media"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/repository"
+	"hobby-blog/internal/storage"
 )
 
 type MediaService struct {
-	postRepo  *repository.PostRepository
-	mediaRepo *repository.MediaRepository
+	postRepo  repository.PostRepository
+	mediaRepo repository.MediaRepository
+	storage   storage.FileStorage
 }
 
-var (
-	ErrForbidden        = errors.New("forbidden")
-	ErrUnsupportedMedia = errors.New("unsupported media")
-	ErrNotFound         = errors.New("not found")
-)
-
 func NewMediaService(
-	postRepo *repository.PostRepository,
-	mediaRepo *repository.MediaRepository,
+	postRepo repository.PostRepository,
+	mediaRepo repository.MediaRepository,
+	storage storage.FileStorage,
 ) *MediaService {
 	return &MediaService{
 		postRepo:  postRepo,
 		mediaRepo: mediaRepo,
+		storage:   storage,
 	}
 }
 
-func (s *MediaService) CreateMedia(userID uint, postID int, file *multipart.FileHeader) error {
+func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.FileHeader) error {
 	post, err := s.postRepo.FindByID(postID)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return ErrNotFound
+		if stdErrors.Is(err, gorm.ErrRecordNotFound) {
+			return appErrors.ErrNotFound
 		}
 		return err
 	}
 
 	if post.UserID != userID {
-		return ErrForbidden
+		return appErrors.ErrForbidden
 	}
 
 	tmp, err := file.Open()
@@ -62,7 +57,7 @@ func (s *MediaService) CreateMedia(userID uint, postID int, file *multipart.File
 	buffer := make([]byte, 512)
 	n, err := tmp.Read(buffer)
 
-	if err != nil && !errors.Is(err, io.EOF) {
+	if err != nil && !stdErrors.Is(err, io.EOF) {
 		return err
 	}
 
@@ -75,32 +70,13 @@ func (s *MediaService) CreateMedia(userID uint, postID int, file *multipart.File
 	case strings.HasPrefix(contentType, "video/"):
 		mediaType = media.TypeVideo
 	default:
-		return ErrUnsupportedMedia
+		return appErrors.ErrUnsupportedMedia
 	}
 
-	src, err := file.Open()
+	path, fileName, err := s.storage.Save(file)
 
 	if err != nil {
-		return err
-	}
-
-	defer src.Close()
-
-	ext := filepath.Ext(file.Filename)
-	fileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
-	path := "uploads/" + fileName
-
-	if err := os.MkdirAll("uploads", 0755); err != nil {
-		return err
-	}
-
-	dst, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	if _, err := dst.ReadFrom(src); err != nil {
+		_ = s.storage.Delete(path)
 		return err
 	}
 

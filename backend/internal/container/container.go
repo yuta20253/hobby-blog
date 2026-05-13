@@ -2,9 +2,11 @@ package container
 
 import (
 	"gorm.io/gorm"
+	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/service"
+	"hobby-blog/internal/storage"
 )
 
 type Container struct {
@@ -15,6 +17,8 @@ type Container struct {
 }
 
 func NewContainer(db *gorm.DB) *Container {
+	cfg := config.Load()
+
 	userRepo := repository.NewUserRepository(db)
 	authService := service.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
@@ -27,7 +31,9 @@ func NewContainer(db *gorm.DB) *Container {
 	mypageHandler := handler.NewMypageHandler(mypageService)
 
 	mediaRepo := repository.NewMediaRepository(db)
-	mediaService := service.NewMediaService(postRepo, mediaRepo)
+
+	st := storage.NewLocalStorage(cfg.UploadPath)
+	mediaService := service.NewMediaService(postRepo, mediaRepo, st)
 	mediaHandler := handler.NewMediaHandler(mediaService)
 
 	return &Container{

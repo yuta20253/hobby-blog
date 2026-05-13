@@ -5,14 +5,18 @@ import (
 	"hobby-blog/internal/model"
 )
 
-type MediaRepository struct {
+type mediaRepository struct {
 	db *gorm.DB
 }
 
-func NewMediaRepository(db *gorm.DB) *MediaRepository {
-	return &MediaRepository{db: db}
+type MediaRepository interface {
+	Create(media *model.MediaFile) error
 }
 
-func (r *MediaRepository) Create(media *model.MediaFile) error {
+func NewMediaRepository(db *gorm.DB) MediaRepository {
+	return &mediaRepository{db: db}
+}
+
+func (r *mediaRepository) Create(media *model.MediaFile) error {
 	return r.db.Create(media).Error
 }

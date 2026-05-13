@@ -8,7 +8,7 @@ import (
 )
 
 type AuthService struct {
-	repo *repository.UserRepository
+	repo repository.UserRepository
 }
 
 type AuthUserResponse struct {
@@ -22,7 +22,7 @@ type AuthResult struct {
 	Token string           `json:"token"`
 }
 
-func NewAuthService(repo *repository.UserRepository) *AuthService {
+func NewAuthService(repo repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 

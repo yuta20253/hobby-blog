@@ -3,6 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/service"
 	"strconv"
 )
@@ -48,15 +49,15 @@ func (h *MediaHandler) UploadMedia(c *gin.Context) {
 		return
 	}
 
-	err = h.service.CreateMedia(uid, postID, file)
+	err = h.service.CreateMedia(uid, uint(postID), file)
 
 	if err != nil {
 		switch {
-		case errors.Is(err, service.ErrForbidden):
+		case errors.Is(err, appErrors.ErrForbidden):
 			c.JSON(403, gin.H{"error": "forbidden"})
-		case errors.Is(err, service.ErrUnsupportedMedia):
+		case errors.Is(err, appErrors.ErrUnsupportedMedia):
 			c.JSON(400, gin.H{"error": "unsupported file type"})
-		case errors.Is(err, service.ErrNotFound):
+		case errors.Is(err, appErrors.ErrNotFound):
 			c.JSON(404, gin.H{"error": "post not found"})
 		default:
 			c.JSON(500, gin.H{"error": "failed to save media"})

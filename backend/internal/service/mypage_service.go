@@ -6,8 +6,8 @@ import (
 )
 
 type MypageService struct {
-	userRepo *repository.UserRepository
-	postRepo *repository.PostRepository
+	userRepo repository.UserRepository
+	postRepo repository.PostRepository
 }
 
 type MypageResponse struct {
@@ -21,7 +21,7 @@ type UserResponse struct {
 	Email string `json:"email"`
 }
 
-func NewMypageService(userRepo *repository.UserRepository, postRepo *repository.PostRepository) *MypageService {
+func NewMypageService(userRepo repository.UserRepository, postRepo repository.PostRepository) *MypageService {
 	return &MypageService{
 		userRepo: userRepo,
 		postRepo: postRepo,

@@ -8,7 +8,7 @@ import (
 )
 
 type PostService struct {
-	repo *repository.PostRepository
+	repo repository.PostRepository
 }
 
 type PostDetailResponse struct {
@@ -19,7 +19,7 @@ type PostDetailResponse struct {
 	Category dto.CategoryResponse `json:"category"`
 }
 
-func NewPostService(repo *repository.PostRepository) *PostService {
+func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 

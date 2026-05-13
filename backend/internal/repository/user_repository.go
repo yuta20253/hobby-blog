@@ -5,19 +5,25 @@ import (
 	"hobby-blog/internal/model"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	Create(user *model.User) error
+	FindByEmail(email string) (*model.User, error)
+	FindByID(id uint) (*model.User, error)
+}
+
+type userRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db: db}
 }
 
-func (r *UserRepository) Create(user *model.User) error {
+func (r *userRepository) Create(user *model.User) error {
 	return r.db.Create(user).Error
 }
 
-func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
+func (r *userRepository) FindByEmail(email string) (*model.User, error) {
 	var user model.User
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
@@ -26,7 +32,7 @@ func (r *UserRepository) FindByEmail(email string) (*model.User, error) {
 	return &user, nil
 }
 
-func (r *UserRepository) FindByID(id uint) (*model.User, error) {
+func (r *userRepository) FindByID(id uint) (*model.User, error) {
 	var user model.User
 	if err := r.db.First(&user, id).Error; err != nil {
 		return nil, err
