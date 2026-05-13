@@ -2,66 +2,53 @@ package service
 
 import (
 	"errors"
+	"gorm.io/gorm"
 	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/dto"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/repository"
 )
 
 type PostService struct {
-	repo *repository.PostRepository
-}
-
-type PostResponse struct {
-	ID       uint             `json:"id"`
-	Title    string           `json:"title"`
-	User     PostUserResponse `json:"user"`
-	Category CategoryResponse `json:"category"`
-}
-
-type PostUserResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
-type CategoryResponse struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
+	repo repository.PostRepository
 }
 
 type PostDetailResponse struct {
-	ID       uint             `json:"id"`
-	Title    string           `json:"title"`
-	Content  string           `json:"content"`
-	User     PostUserResponse `json:"user"`
-	Category CategoryResponse `json:"category"`
+	ID         uint                    `json:"id"`
+	Title      string                  `json:"title"`
+	Content    string                  `json:"content"`
+	User       dto.PostUserResponse    `json:"user"`
+	Category   dto.CategoryResponse    `json:"category"`
+	MediaFiles []dto.MediaFileResponse `json:"media_files"`
 }
 
-func NewPostService(repo *repository.PostRepository) *PostService {
+func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q post.SearchQuery) ([]PostResponse, error) {
+func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error) {
 	posts, err := s.repo.Search(q)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]PostResponse, 0, len(posts))
+	res := make([]dto.PostResponse, 0, len(posts))
 
-	for _, p := range posts {
-		res = append(res, PostResponse{
-			ID:    p.ID,
-			Title: p.Title,
-			User: PostUserResponse{
-				ID:    p.User.ID,
-				Name:  p.User.Name,
-				Email: p.User.Email,
+	for _, post := range posts {
+		res = append(res, dto.PostResponse{
+			ID:    post.ID,
+			Title: post.Title,
+			User: dto.PostUserResponse{
+				ID:    post.User.ID,
+				Name:  post.User.Name,
+				Email: post.User.Email,
 			},
-			Category: CategoryResponse{
-				ID:   p.Category.ID,
-				Name: p.Category.Name,
+			Category: dto.CategoryResponse{
+				ID:   post.Category.ID,
+				Name: post.Category.Name,
 			},
+			MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 		})
 	}
 
@@ -72,6 +59,9 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 	post, err := s.repo.Get(id)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
 		return nil, err
 	}
 
@@ -79,15 +69,16 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: PostUserResponse{
+		User: dto.PostUserResponse{
 			ID:    post.User.ID,
 			Name:  post.User.Name,
 			Email: post.User.Email,
 		},
-		Category: CategoryResponse{
+		Category: dto.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
+		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 
@@ -99,11 +90,14 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, appErrors.ErrNotFound
+		}
 		return nil, err
 	}
 
 	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
-		return nil, errors.New("invalid status transition")
+		return nil, appErrors.ErrInvalidInput
 	}
 
 	post, err := s.repo.Update(input)
@@ -116,17 +110,27 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: PostUserResponse{
+		User: dto.PostUserResponse{
 			ID:   post.User.ID,
 			Name: post.User.Name,
 		},
-		Category: CategoryResponse{
+		Category: dto.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
+		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 
 func (s *PostService) DeletePost(id uint, userID uint) error {
-	return s.repo.Delete(id, userID)
+	err := s.repo.Delete(id, userID)
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return appErrors.ErrNotFound
+		}
+		return err
+	}
+
+	return nil
 }

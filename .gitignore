@@ -1,6 +1,7 @@
 # backend
 backend/tmp
 backend/bin
+backend/uploads
 
 # frontend
 frontend/node_modules

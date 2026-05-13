@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/middleware"
 	"log"
@@ -10,14 +11,15 @@ import (
 )
 
 func SetUpRouter(
+	cfg *config.Config,
 	authHandler *handler.AuthHandler,
 	postHandler *handler.PostHandler,
+	mypageHandler *handler.MypageHandler,
+	mediaHandler *handler.MediaHandler,
 ) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost:5173",
-		},
+		AllowOrigins: cfg.CORSAllowOrigins,
 
 		AllowMethods: []string{
 			"GET",
@@ -68,6 +70,11 @@ func SetUpRouter(
 	postsPrivate.POST("", postHandler.Create)
 	postsPrivate.PATCH("/:id", postHandler.Update)
 	postsPrivate.DELETE("/:id", postHandler.Delete)
+
+	postsPrivate.POST("/:id/media", mediaHandler.UploadMedia)
+
+	mypage := private.Group("")
+	mypage.GET("/mypage", mypageHandler.Show)
 
 	return r
 }

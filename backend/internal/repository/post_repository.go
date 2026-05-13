@@ -6,15 +6,25 @@ import (
 	"hobby-blog/internal/model"
 )
 
-type PostRepository struct {
+type postRepository struct {
 	db *gorm.DB
 }
 
-func NewPostRepository(db *gorm.DB) *PostRepository {
-	return &PostRepository{db: db}
+type PostRepository interface {
+	Search(post.SearchQuery) ([]model.Post, error)
+	Get(uint) (model.Post, error)
+	Create(post.CreateInput) error
+	Update(post.UpdateInput) (model.Post, error)
+	Delete(uint, uint) error
+	GetMyPostsByUserID(uint) ([]model.Post, error)
+	FindByID(uint) (model.Post, error)
 }
 
-func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
+func NewPostRepository(db *gorm.DB) PostRepository {
+	return &postRepository{db: db}
+}
+
+func (r *postRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 	var posts []model.Post
 
 	query := r.db.
@@ -44,7 +54,7 @@ func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 		Offset(q.Offset).
 		Order("posts.created_at DESC")
 
-	err := query.Preload("User").Preload("Category").Find(&posts).Error
+	err := query.Preload("User").Preload("Category").Preload("MediaFiles").Find(&posts).Error
 
 	if err != nil {
 		return nil, err
@@ -53,13 +63,13 @@ func (r *PostRepository) Search(q post.SearchQuery) ([]model.Post, error) {
 	return posts, nil
 }
 
-func (r *PostRepository) Get(id uint) (model.Post, error) {
+func (r *postRepository) Get(id uint) (model.Post, error) {
 	var post model.Post
-	err := r.db.Preload("User").Preload("Category").First(&post, id).Error
+	err := r.db.Preload("User").Preload("Category").Preload("MediaFiles").First(&post, id).Error
 	return post, err
 }
 
-func (r *PostRepository) Create(param post.CreateInput) error {
+func (r *postRepository) Create(param post.CreateInput) error {
 	p := model.Post{
 		UserID:     param.UserID,
 		CategoryID: param.CategoryID,
@@ -71,7 +81,7 @@ func (r *PostRepository) Create(param post.CreateInput) error {
 	return r.db.Create(&p).Error
 }
 
-func (r *PostRepository) Update(param post.UpdateInput) (model.Post, error) {
+func (r *postRepository) Update(param post.UpdateInput) (model.Post, error) {
 	var post model.Post
 	result := r.db.Model(&model.Post{}).
 		Where("id = ? AND user_id = ?", param.ID, param.UserID).
@@ -94,7 +104,7 @@ func (r *PostRepository) Update(param post.UpdateInput) (model.Post, error) {
 	return post, err
 }
 
-func (r *PostRepository) Delete(id uint, userID uint) error {
+func (r *postRepository) Delete(id uint, userID uint) error {
 
 	result := r.db.
 		Where("id = ? AND user_id = ?", id, userID).
@@ -109,4 +119,25 @@ func (r *PostRepository) Delete(id uint, userID uint) error {
 	}
 
 	return nil
+}
+
+func (r *postRepository) GetMyPostsByUserID(userID uint) ([]model.Post, error) {
+	var posts []model.Post
+	result := r.db.Preload("Category").Where("user_id = ?", userID).Find(&posts)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return posts, nil
+}
+
+func (r *postRepository) FindByID(postID uint) (model.Post, error) {
+	var post model.Post
+	err := r.db.First(&post, postID).Error
+
+	if err != nil {
+		return model.Post{}, err
+	}
+
+	return post, nil
 }

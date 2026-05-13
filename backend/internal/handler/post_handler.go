@@ -6,7 +6,6 @@ import (
 	"gorm.io/gorm"
 	"hobby-blog/internal/domain/post"
 	"hobby-blog/internal/service"
-	"strconv"
 )
 
 type PostHandler struct {
@@ -74,18 +73,14 @@ func (h *PostHandler) Index(c *gin.Context) {
 	var q PostSearchQuery
 
 	if err := c.ShouldBindQuery(&q); err != nil {
-		c.JSON(400, gin.H{
-			"error": "invalid query",
-		})
+		respondError(c, 400, "invalid query")
 		return
 	}
 
 	posts, err := h.service.SearchPosts(q.ToDomain())
 
 	if err != nil {
-		c.JSON(500, gin.H{
-			"error": "failed to fetch posts",
-		})
+		respondError(c, 500, "failed to fetch posts")
 		return
 	}
 
@@ -95,23 +90,17 @@ func (h *PostHandler) Index(c *gin.Context) {
 }
 
 func (h *PostHandler) Show(c *gin.Context) {
-	idStr := c.Param("id")
 
-	id, err := strconv.Atoi(idStr)
+	postId, ok := getParamID(c, "id")
 
-	if err != nil {
-		c.JSON(400, gin.H{
-			"error": "invalid id",
-		})
+	if !ok {
 		return
 	}
 
-	post, err := h.service.GetPost(uint(id))
+	post, err := h.service.GetPost(postId)
 
 	if err != nil {
-		c.JSON(404, gin.H{
-			"error": "failed to fetch post",
-		})
+		respondError(c, 404, "failed to fetch post")
 		return
 	}
 
@@ -124,32 +113,20 @@ func (h *PostHandler) Create(c *gin.Context) {
 	var req CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{
-			"error": "invalid request",
-		})
+		respondError(c, 400, "invalid request")
 		return
 	}
 
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{
-			"error": "unauthorized",
-		})
-		return
-	}
-
-	id, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "invalid user id"})
 		return
 	}
 
-	err := h.service.CreatePost(req.ToDomain(uint(id)))
+	err := h.service.CreatePost(req.ToDomain(uid))
 
 	if err != nil {
-		c.JSON(500, gin.H{"error": "failed"})
+		respondError(c, 500, "failed")
 		return
 	}
 
@@ -162,44 +139,32 @@ func (h *PostHandler) Update(c *gin.Context) {
 	var req UpdatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{
-			"error": "invalid request",
-		})
+		respondError(c, 400, "invalid request")
 		return
 	}
 
-	idStr := c.Param("id")
-
-	id, err := strconv.Atoi(idStr)
-
-	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid id"})
-		return
-	}
-
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{"error": "unauthorized"})
-		return
-	}
-
-	uid, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
 		c.JSON(500, gin.H{"error": "failed"})
 		return
 	}
 
-	updatedPost, err := h.service.UpdatePost(req.ToDomain(uint(id), uid))
+	postID, ok := getParamID(c, "id")
+
+	if !ok {
+		return
+	}
+
+	updatedPost, err := h.service.UpdatePost(req.ToDomain(postID, uid))
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, gin.H{"error": "not found"})
+			respondError(c, 404, "not found")
 			return
 		}
 
-		c.JSON(500, gin.H{"error": "failed"})
+		respondError(c, 500, "failed")
 		return
 	}
 
@@ -209,37 +174,27 @@ func (h *PostHandler) Update(c *gin.Context) {
 }
 
 func (h *PostHandler) Delete(c *gin.Context) {
-	idStr := c.Param("id")
-
-	id, err := strconv.Atoi(idStr)
-
-	if err != nil {
-		c.JSON(400, gin.H{"error": "invalid id"})
-		return
-	}
-
-	userID, exists := c.Get("userID")
-
-	if !exists {
-		c.JSON(401, gin.H{"error": "unauthorized"})
-		return
-	}
-
-	uid, ok := userID.(uint)
+	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "invalid user id"})
+		respondError(c, 500, "invalid user id")
 		return
 	}
 
-	err = h.service.DeletePost(uint(id), uid)
+	postID, ok := getParamID(c, "id")
+
+	if !ok {
+		return
+	}
+
+	err := h.service.DeletePost(postID, uid)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(404, gin.H{"error": "not found"})
+			respondError(c, 404, "not found")
 			return
 		}
-		c.JSON(500, gin.H{"error": "invalid id"})
+		respondError(c, 500, "invalid id")
 		return
 	}
 
