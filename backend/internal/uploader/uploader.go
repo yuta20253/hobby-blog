@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/google/uuid"
+	"path/filepath"
+
 	"hobby-blog/internal/domain/media"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/storage"
@@ -51,7 +54,7 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 	}
 
 	ext := filepath.Ext(file.Filename)
-	if err == "" {
+	if ext == "" {
 		return "", "", appErrors.ErrUnsupportedMedia
 	}
 
@@ -63,4 +66,8 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 	}
 
 	return path, mediaType, nil
+}
+
+func (u *Uploader) Delete(path string) error {
+	return u.storage.Delete(path)
 }

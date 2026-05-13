@@ -6,16 +6,16 @@ import (
 )
 
 type Config struct {
-	UploadPath string
+	UploadPath       string
 	CORSAllowOrigins []string
-	Env string
+	Env              string
 }
 
 func Load() *Config {
 	return &Config{
-		UploadPath: getEnv("UPLOAD_PATH", "uploads"),
-		CORSAllowOrigins: getEnvAsSlice("CORS_ALLOW_ORIGINS", []string{"http://localhost:5173"})
-		Env: getEnv("ENV", "development"),
+		UploadPath:       getEnv("UPLOAD_PATH", "uploads"),
+		CORSAllowOrigins: getEnvAsSlice("CORS_ALLOW_ORIGINS", []string{"http://localhost:5173"}),
+		Env:              getEnv("ENV", "development"),
 	}
 }
 

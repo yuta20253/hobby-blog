@@ -48,7 +48,7 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 		return err
 	}
 
-	err := s.mediaRepo.Create(&model.MediaFile{
+	err = s.mediaRepo.Create(&model.MediaFile{
 		PostID:   postID,
 		Type:     mediaType,
 		FilePath: filePath,
@@ -56,7 +56,7 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 	})
 
 	if err != nil {
-		_, s.storage.Delete(filePath)
+		_ = s.uploader.Delete(filePath)
 		return err
 	}
 

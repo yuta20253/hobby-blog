@@ -1,11 +1,9 @@
 package storage
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 type LocalStorage struct {
@@ -43,9 +41,4 @@ func (s *LocalStorage) Save(reader io.Reader, filename string) (string, error) {
 
 func (s *LocalStorage) Delete(path string) error {
 	return os.Remove(path)
-}
-
-func (s *LocalStorage) generateFileName(filename string) string {
-	ext := filepath.Ext(filename)
-	return fmt.Sprintf("%d%s", time.Now().UnixNano(), ext)
 }

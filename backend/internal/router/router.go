@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/middleware"
 	"log"
@@ -10,7 +11,7 @@ import (
 )
 
 func SetUpRouter(
-	cfg *config.Config
+	cfg *config.Config,
 	authHandler *handler.AuthHandler,
 	postHandler *handler.PostHandler,
 	mypageHandler *handler.MypageHandler,
@@ -18,7 +19,7 @@ func SetUpRouter(
 ) *gin.Engine {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: config.CORS_ALLOW_ORIGINS,
+		AllowOrigins: cfg.CORSAllowOrigins,
 
 		AllowMethods: []string{
 			"GET",

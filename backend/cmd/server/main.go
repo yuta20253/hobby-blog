@@ -1,6 +1,7 @@
 package main
 
 import (
+	"hobby-blog/internal/config"
 	"hobby-blog/internal/container"
 	"hobby-blog/internal/db"
 	"hobby-blog/internal/router"
@@ -12,7 +13,10 @@ func main() {
 
 	c := container.NewContainer(dbConn)
 
+	cfg := config.Load()
+
 	r := router.SetUpRouter(
+		cfg,
 		c.AuthHandler,
 		c.PostHandler,
 		c.MypageHandler,
