@@ -2,6 +2,7 @@ package uploader
 
 import (
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -38,6 +39,7 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 	}
 
 	contentType := http.DetectContentType(buffer[:n])
+	log.Printf("[DEBUG] File: %s, ContentType: %s, Size: %d bytes", file.Filename, contentType, file.Size)
 
 	var mediaType media.Type
 	switch {
@@ -46,6 +48,7 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 	case strings.HasPrefix(contentType, "video/"):
 		mediaType = media.TypeVideo
 	default:
+		log.Printf("[ERROR] Unsupported media type: %s", contentType)
 		return "", "", appErrors.ErrUnsupportedMedia
 	}
 
@@ -55,10 +58,12 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 
 	ext := filepath.Ext(file.Filename)
 	if ext == "" {
+		log.Printf("[ERROR] No file extension: %s", file.Filename)
 		return "", "", appErrors.ErrUnsupportedMedia
 	}
 
 	filename := uuid.New().String() + ext
+	log.Printf("[DEBUG] Generated filename: %s", filename)
 
 	path, err := u.storage.Save(f, filename)
 	if err != nil {
