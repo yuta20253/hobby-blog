@@ -29,7 +29,5 @@ func (h *MypageHandler) Show(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"mypage": mypage,
-	})
+	c.JSON(200, mypage)
 }

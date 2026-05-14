@@ -21,9 +21,15 @@ export const useAuth = () => {
     isAuthenticated.value = false;
   };
 
+  const getLocalStorage = () => {
+    const token = localStorage.getItem("token");
+    return token;
+  };
+
   return {
     isAuthenticated,
     setLocalStorage,
     removeLocalStgage,
+    getLocalStorage,
   };
 };
