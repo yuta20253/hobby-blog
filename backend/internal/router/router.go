@@ -76,5 +76,7 @@ func SetUpRouter(
 	mypage := private.Group("")
 	mypage.GET("/mypage", mypageHandler.Show)
 
+	r.Static("/uploads", "./uploads")
+
 	return r
 }

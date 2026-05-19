@@ -12,6 +12,8 @@ const router = useRouter();
 
 const postId = route.params.id;
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 onMounted(async () => {
   post.value = await useFetchPost(Number(postId));
 });
@@ -41,7 +43,29 @@ const handleBack = () => {
       </div>
 
       <div class="content">
-        {{ post.content }}
+            {{ post.content }}
+      </div>
+      <div v-if="post.media_files && post.media_files.length" class="media-list">
+        <div
+          v-for="media in post.media_files"
+          :key="media.id"
+          class="media-item"
+        >
+          <img
+            v-if="media.type === 'image'"
+            :src="BASE_URL + media.file_path"
+            :alt="media.file_name"
+            class="media-image"
+          />
+          <video
+            v-else-if="media.type === 'video'"
+            controls
+            class="media-video"
+          >
+            <source :src="media.file_path" type="video/mp4" />
+            お使いのブラウザは動画タグに対応していません。
+          </video>
+        </div>
       </div>
     </div>
 
@@ -146,5 +170,31 @@ const handleBack = () => {
 
 .return-button button:hover {
   background-color: v-bind("theme.colors.backgroundDark");
+}
+
+/* メディア */
+.media-list {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+.media-item {
+  max-width: 320px;
+  max-height: 240px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.media-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

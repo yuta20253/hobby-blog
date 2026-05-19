@@ -36,9 +36,10 @@ func (s *LocalStorage) Save(reader io.Reader, filename string) (string, error) {
 		return "", err
 	}
 
-	return filePath, nil
+	return "/uploads/" + safeName, nil
 }
 
 func (s *LocalStorage) Delete(path string) error {
-	return os.Remove(path)
+	fullPath := filepath.Join(s.basePath, filepath.Base(path))
+	return os.Remove(fullPath)
 }
