@@ -55,10 +55,16 @@ func (s *MypageService) GetMyPage(id uint) (*MypageResponse, error) {
 			ID:      p.ID,
 			Title:   p.Title,
 			Content: p.Content,
+			User: dto.PostUserResponse{
+				ID:    p.User.ID,
+				Name:  p.User.Name,
+				Email: p.User.Email,
+			},
 			Category: dto.CategoryResponse{
 				ID:   p.Category.ID,
 				Name: p.Category.Name,
 			},
+			MediaFiles: dto.NewMediaFileResponses(p.MediaFiles),
 		})
 	}
 
