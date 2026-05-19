@@ -179,17 +179,14 @@ const handleBack = () => {
   margin-top: 8px;
   flex-wrap: wrap;
 }
+
 .media-item {
-  max-width: 320px;
-  max-height: 240px;
-  overflow: hidden;
-  border-radius: 8px;
+  max-width: 200px;
 }
+
 .media-image {
-  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 .media-video {
   display: block;

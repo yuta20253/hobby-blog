@@ -10,6 +10,7 @@ const user = ref<User | null>(null);
 const posts = ref<Post[]>([]);
 const isLoading = ref(true);
 const isError = ref(false);
+const BASE_URL = import.meta.env.VITE_API_URL;
 const { getLocalStorage } = useAuth();
 
 onMounted(async () => {
@@ -65,7 +66,6 @@ onMounted(async () => {
                 {{ post.content?.substring(0, 100) }}...
               </p>
             </RouterLink>
-            <!-- メディアファイル表示 -->
             <div v-if="post.media_files && post.media_files.length" class="media-list">
               <div
                 v-for="media in post.media_files"
@@ -74,7 +74,7 @@ onMounted(async () => {
               >
                 <img
                   v-if="media.type === 'image'"
-                  :src="media.file_path"
+                  :src="BASE_URL + media.file_path"
                   :alt="media.file_name"
                   class="media-image"
                 />
@@ -229,18 +229,16 @@ onMounted(async () => {
   margin-top: 8px;
   flex-wrap: wrap;
 }
+
 .media-item {
   max-width: 200px;
-  max-height: 140px;
-  overflow: hidden;
-  border-radius: 8px;
 }
+
 .media-image {
-  display: block;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
+
 .media-video {
   display: block;
   width: 100%;
