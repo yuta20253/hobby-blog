@@ -123,7 +123,7 @@ func (r *postRepository) Delete(id uint, userID uint) error {
 
 func (r *postRepository) GetMyPostsByUserID(userID uint) ([]model.Post, error) {
 	var posts []model.Post
-	result := r.db.Preload("Category").Where("user_id = ?", userID).Find(&posts)
+	result := r.db.Preload("Category").Preload("MediaFiles").Where("user_id = ?", userID).Find(&posts)
 
 	if result.Error != nil {
 		return nil, result.Error
