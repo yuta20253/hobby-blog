@@ -13,15 +13,6 @@ type PostService struct {
 	repo repository.PostRepository
 }
 
-type PostDetailResponse struct {
-	ID         uint                    `json:"id"`
-	Title      string                  `json:"title"`
-	Content    string                  `json:"content"`
-	User       dto.PostUserResponse    `json:"user"`
-	Category   dto.CategoryResponse    `json:"category"`
-	MediaFiles []dto.MediaFileResponse `json:"media_files"`
-}
-
 func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
@@ -55,17 +46,17 @@ func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error
 	return res, nil
 }
 
-func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
+func (s *PostService) GetPost(id uint) (dto.PostDetailResponse, error) {
 	post, err := s.repo.Get(id)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, appErrors.ErrNotFound
+			return dto.PostDetailResponse{}, appErrors.ErrNotFound
 		}
-		return nil, err
+		return dto.PostDetailResponse{}, err
 	}
 
-	return &PostDetailResponse{
+	return dto.PostDetailResponse{
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
@@ -86,27 +77,27 @@ func (s *PostService) CreatePost(input post.CreateInput) error {
 	return s.repo.Create(input)
 }
 
-func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, error) {
+func (s *PostService) UpdatePost(input post.UpdateInput) (dto.PostDetailResponse, error) {
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, appErrors.ErrNotFound
+			return dto.PostDetailResponse{}, appErrors.ErrNotFound
 		}
-		return nil, err
+		return dto.PostDetailResponse{}, err
 	}
 
 	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
-		return nil, appErrors.ErrInvalidInput
+		return dto.PostDetailResponse{}, appErrors.ErrInvalidInput
 	}
 
 	post, err := s.repo.Update(input)
 
 	if err != nil {
-		return nil, err
+		return dto.PostDetailResponse{}, err
 	}
 
-	return &PostDetailResponse{
+	return dto.PostDetailResponse{
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
