@@ -7,6 +7,7 @@ import (
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/middleware"
 	"log"
+	"path/filepath"
 	"time"
 )
 
@@ -76,7 +77,11 @@ func SetUpRouter(
 	mypage := private.Group("")
 	mypage.GET("/mypage", mypageHandler.Show)
 
-	r.Static("/uploads", "./uploads")
+	uploadPath, err := filepath.Abs("./uploads")
+	if err != nil {
+		log.Fatal(err)
+	}
+	r.Static("/uploads", uploadPath)
 
 	return r
 }

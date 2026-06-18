@@ -9,7 +9,7 @@ type MyPageResponse = {
 
 export const useFetchMyData = async (
   token: string
-): Promise<MyPageResponse> => {
+): Promise<{ user: User; posts: Post[] }> => {
   try {
     const url = import.meta.env.VITE_API_URL + "/api/mypage";
     const res = await axios.get<MyPageResponse>(url, {
@@ -17,7 +17,10 @@ export const useFetchMyData = async (
         Authorization: `Bearer ${token}`,
       },
     });
-    return res.data;
+    return {
+      user: res.data.user,
+      posts: res.data.posts ?? [],
+    };
   } catch (error) {
     console.error(error);
     throw error;

@@ -22,8 +22,8 @@ onMounted(async () => {
     }
     const { user: fetchedUser, posts: fetchedPosts } =
       await useFetchMyData(token);
-    user.value = fetchedUser;
-    posts.value = fetchedPosts;
+    user.value = fetchedUser ?? null;
+    posts.value = fetchedPosts ?? [];
   } catch (e) {
     console.error(e);
     isError.value = true;
@@ -47,7 +47,7 @@ onMounted(async () => {
       </div>
       <div class="posts-section">
         <h3 class="section-title">あなたの投稿</h3>
-        <div v-if="posts.length === 0" class="empty">投稿がありません</div>
+        <div v-if="!posts || posts.length === 0" class="empty">投稿がありません</div>
         <div v-else class="posts-list">
           <div
             v-for="post in posts"
@@ -83,7 +83,7 @@ onMounted(async () => {
                   controls
                   class="media-video"
                 >
-                  <source :src="media.file_path" type="video/mp4" />
+                  <source :src="BASE_URL + media.file_path" type="video/mp4" />
                   お使いのブラウザは動画タグに対応していません。
                 </video>
               </div>

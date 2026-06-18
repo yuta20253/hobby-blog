@@ -62,7 +62,7 @@ const handleBack = () => {
             controls
             class="media-video"
           >
-            <source :src="media.file_path" type="video/mp4" />
+            <source :src="BASE_URL + media.file_path" type="video/mp4" />
             お使いのブラウザは動画タグに対応していません。
           </video>
         </div>
