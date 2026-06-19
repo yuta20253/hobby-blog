@@ -3,8 +3,9 @@ package handler
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
+
 	"hobby-blog/internal/dto/request"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/service"
 )
 
@@ -49,7 +50,12 @@ func (h *PostHandler) Show(c *gin.Context) {
 	post, err := h.service.GetPost(postId)
 
 	if err != nil {
-		respondError(c, 404, "failed to fetch post")
+		if errors.Is(err, appErrors.ErrNotFound) {
+			respondError(c, 404, "not found")
+			return
+		}
+
+		respondError(c, 500, "failed")
 		return
 	}
 
@@ -108,12 +114,17 @@ func (h *PostHandler) Update(c *gin.Context) {
 	updatedPost, err := h.service.UpdatePost(req.ToInput(postID, uid))
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, appErrors.ErrNotFound) {
 			respondError(c, 404, "not found")
 			return
 		}
 
-		respondError(c, 500, "failed")
+		if errors.Is(err, appErrors.ErrInvalidInput) {
+			respondError(c, 400, "invalid input")
+			return
+		}
+
+		respondError(c, 500, "invalid user id")
 		return
 	}
 
@@ -139,11 +150,11 @@ func (h *PostHandler) Delete(c *gin.Context) {
 	err := h.service.DeletePost(postID, uid)
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, appErrors.ErrNotFound) {
 			respondError(c, 404, "not found")
 			return
 		}
-		respondError(c, 500, "invalid id")
+		respondError(c, 500, "failed")
 		return
 	}
 
