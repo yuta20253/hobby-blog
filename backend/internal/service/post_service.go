@@ -3,9 +3,10 @@ package service
 import (
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/domain/post"
-	"hobby-blog/internal/dto"
+	"hobby-blog/internal/dto/request"
+	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
+	"hobby-blog/internal/model"
 	"hobby-blog/internal/repository"
 )
 
@@ -14,41 +15,41 @@ type PostService struct {
 }
 
 type PostDetailResponse struct {
-	ID         uint                    `json:"id"`
-	Title      string                  `json:"title"`
-	Content    string                  `json:"content"`
-	User       dto.PostUserResponse    `json:"user"`
-	Category   dto.CategoryResponse    `json:"category"`
-	MediaFiles []dto.MediaFileResponse `json:"media_files"`
+	ID         uint                         `json:"id"`
+	Title      string                       `json:"title"`
+	Content    string                       `json:"content"`
+	User       response.PostUserResponse    `json:"user"`
+	Category   response.CategoryResponse    `json:"category"`
+	MediaFiles []response.MediaFileResponse `json:"media_files"`
 }
 
 func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error) {
+func (s *PostService) SearchPosts(q request.SearchPostQuery) ([]response.PostResponse, error) {
 	posts, err := s.repo.Search(q)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]dto.PostResponse, 0, len(posts))
+	res := make([]response.PostResponse, 0, len(posts))
 
 	for _, post := range posts {
-		res = append(res, dto.PostResponse{
+		res = append(res, response.PostResponse{
 			ID:    post.ID,
 			Title: post.Title,
-			User: dto.PostUserResponse{
+			User: response.PostUserResponse{
 				ID:    post.User.ID,
 				Name:  post.User.Name,
 				Email: post.User.Email,
 			},
-			Category: dto.CategoryResponse{
+			Category: response.CategoryResponse{
 				ID:   post.Category.ID,
 				Name: post.Category.Name,
 			},
-			MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
+			MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
 		})
 	}
 
@@ -69,24 +70,24 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: dto.PostUserResponse{
+		User: response.PostUserResponse{
 			ID:    post.User.ID,
 			Name:  post.User.Name,
 			Email: post.User.Email,
 		},
-		Category: dto.CategoryResponse{
+		Category: response.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
-		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
+		MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 
-func (s *PostService) CreatePost(input post.CreateInput) error {
+func (s *PostService) CreatePost(input request.CreatePostInput) error {
 	return s.repo.Create(input)
 }
 
-func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, error) {
+func (s *PostService) UpdatePost(input request.UpdatePostInput) (*PostDetailResponse, error) {
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
@@ -96,7 +97,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		return nil, err
 	}
 
-	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
+	if input.Status == model.StatusPublished && currentPost.Status != model.StatusDraft {
 		return nil, appErrors.ErrInvalidInput
 	}
 
@@ -110,15 +111,15 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
-		User: dto.PostUserResponse{
+		User: response.PostUserResponse{
 			ID:   post.User.ID,
 			Name: post.User.Name,
 		},
-		Category: dto.CategoryResponse{
+		Category: response.CategoryResponse{
 			ID:   post.Category.ID,
 			Name: post.Category.Name,
 		},
-		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
+		MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
 	}, nil
 }
 

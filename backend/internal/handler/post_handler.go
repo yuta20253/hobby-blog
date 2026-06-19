@@ -4,7 +4,8 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"hobby-blog/internal/domain/post"
+	"hobby-blog/internal/dto/request"
+	"hobby-blog/internal/model"
 	"hobby-blog/internal/service"
 )
 
@@ -27,14 +28,14 @@ type CreatePostRequest struct {
 }
 
 type UpdatePostRequest struct {
-	Title      string      `json:"title" binding:"required,max=255"`
-	Content    string      `json:"content" binding:"required"`
-	CategoryID uint        `json:"category_id" binding:"required"`
-	Status     post.Status `json:"status" binding:"required"`
+	Title      string       `json:"title" binding:"required,max=255"`
+	Content    string       `json:"content" binding:"required"`
+	CategoryID uint         `json:"category_id" binding:"required"`
+	Status     model.Status `json:"status" binding:"required"`
 }
 
-func (q PostSearchQuery) ToDomain() post.SearchQuery {
-	return post.SearchQuery{
+func (q PostSearchQuery) ToRequest() request.SearchPostQuery {
+	return request.SearchPostQuery{
 		Title:    q.Title,
 		UserName: q.UserName,
 		Category: q.Category,
@@ -43,8 +44,8 @@ func (q PostSearchQuery) ToDomain() post.SearchQuery {
 	}
 }
 
-func (r CreatePostRequest) ToDomain(userID uint) post.CreateInput {
-	return post.CreateInput{
+func (r CreatePostRequest) ToRequest(userID uint) request.CreatePostInput {
+	return request.CreatePostInput{
 		Title:      r.Title,
 		Content:    r.Content,
 		CategoryID: r.CategoryID,
@@ -52,8 +53,8 @@ func (r CreatePostRequest) ToDomain(userID uint) post.CreateInput {
 	}
 }
 
-func (r UpdatePostRequest) ToDomain(id uint, userID uint) post.UpdateInput {
-	return post.UpdateInput{
+func (r UpdatePostRequest) ToRequest(id uint, userID uint) request.UpdatePostInput {
+	return request.UpdatePostInput{
 		ID:         id,
 		Title:      r.Title,
 		Content:    r.Content,
@@ -77,7 +78,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 		return
 	}
 
-	posts, err := h.service.SearchPosts(q.ToDomain())
+	posts, err := h.service.SearchPosts(q.ToRequest())
 
 	if err != nil {
 		respondError(c, 500, "failed to fetch posts")
@@ -123,7 +124,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.CreatePost(req.ToDomain(uid))
+	err := h.service.CreatePost(req.ToRequest(uid))
 
 	if err != nil {
 		respondError(c, 500, "failed")
@@ -156,7 +157,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedPost, err := h.service.UpdatePost(req.ToDomain(postID, uid))
+	updatedPost, err := h.service.UpdatePost(req.ToRequest(postID, uid))
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

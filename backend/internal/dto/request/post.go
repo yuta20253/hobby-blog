@@ -1,6 +1,8 @@
-package post
+package request
 
-type SearchQuery struct {
+import "hobby-blog/internal/model"
+
+type SearchPostQuery struct {
 	Title    string
 	UserName string
 	Category string
@@ -8,25 +10,18 @@ type SearchQuery struct {
 	Offset   int
 }
 
-type CreateInput struct {
+type CreatePostInput struct {
 	Title      string
 	Content    string
 	CategoryID uint
 	UserID     uint
 }
 
-type Status string
-
-const (
-	StatusDraft     Status = "draft"
-	StatusPublished Status = "published"
-)
-
-type UpdateInput struct {
+type UpdatePostInput struct {
 	ID         uint
 	Title      string
 	Content    string
 	CategoryID uint
 	UserID     uint
-	Status     Status
+	Status     model.Status
 }

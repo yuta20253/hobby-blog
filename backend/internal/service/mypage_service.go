@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/dto"
+	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/repository"
 )
@@ -14,8 +14,8 @@ type MypageService struct {
 }
 
 type MypageResponse struct {
-	User  UserResponse       `json:"user"`
-	Posts []dto.PostResponse `json:"posts"`
+	User  UserResponse            `json:"user"`
+	Posts []response.PostResponse `json:"posts"`
 }
 
 type UserResponse struct {
@@ -48,23 +48,23 @@ func (s *MypageService) GetMyPage(id uint) (*MypageResponse, error) {
 		return nil, err
 	}
 
-	postResponses := make([]dto.PostResponse, 0, len(posts))
+	postResponses := make([]response.PostResponse, 0, len(posts))
 
 	for _, p := range posts {
-		postResponses = append(postResponses, dto.PostResponse{
+		postResponses = append(postResponses, response.PostResponse{
 			ID:      p.ID,
 			Title:   p.Title,
 			Content: p.Content,
-			User: dto.PostUserResponse{
+			User: response.PostUserResponse{
 				ID:    p.User.ID,
 				Name:  p.User.Name,
 				Email: p.User.Email,
 			},
-			Category: dto.CategoryResponse{
+			Category: response.CategoryResponse{
 				ID:   p.Category.ID,
 				Name: p.Category.Name,
 			},
-			MediaFiles: dto.NewMediaFileResponses(p.MediaFiles),
+			MediaFiles: response.NewMediaFileResponses(p.MediaFiles),
 		})
 	}
 
