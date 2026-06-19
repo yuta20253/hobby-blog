@@ -25,26 +25,7 @@ func (s *PostService) SearchPosts(q request.SearchPostQuery) ([]response.PostRes
 		return nil, err
 	}
 
-	res := make([]response.PostResponse, 0, len(posts))
-
-	for _, post := range posts {
-		res = append(res, response.PostResponse{
-			ID:    post.ID,
-			Title: post.Title,
-			User: response.PostUserResponse{
-				ID:    post.User.ID,
-				Name:  post.User.Name,
-				Email: post.User.Email,
-			},
-			Category: response.CategoryResponse{
-				ID:   post.Category.ID,
-				Name: post.Category.Name,
-			},
-			MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
-		})
-	}
-
-	return res, nil
+	return response.NewPostResponses(posts), nil
 }
 
 func (s *PostService) GetPost(id uint) (*response.PostDetailResponse, error) {
@@ -57,21 +38,7 @@ func (s *PostService) GetPost(id uint) (*response.PostDetailResponse, error) {
 		return nil, err
 	}
 
-	return &response.PostDetailResponse{
-		ID:      post.ID,
-		Title:   post.Title,
-		Content: post.Content,
-		User: response.PostUserResponse{
-			ID:    post.User.ID,
-			Name:  post.User.Name,
-			Email: post.User.Email,
-		},
-		Category: response.CategoryResponse{
-			ID:   post.Category.ID,
-			Name: post.Category.Name,
-		},
-		MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
-	}, nil
+	return response.NewPostDetailResponse(post), nil
 }
 
 func (s *PostService) CreatePost(input request.CreatePostInput) error {
@@ -98,20 +65,7 @@ func (s *PostService) UpdatePost(input request.UpdatePostInput) (*response.PostD
 		return nil, err
 	}
 
-	return &response.PostDetailResponse{
-		ID:      post.ID,
-		Title:   post.Title,
-		Content: post.Content,
-		User: response.PostUserResponse{
-			ID:   post.User.ID,
-			Name: post.User.Name,
-		},
-		Category: response.CategoryResponse{
-			ID:   post.Category.ID,
-			Name: post.Category.Name,
-		},
-		MediaFiles: response.NewMediaFileResponses(post.MediaFiles),
-	}, nil
+	return response.NewPostDetailResponse(post), nil
 }
 
 func (s *PostService) DeletePost(id uint, userID uint) error {
