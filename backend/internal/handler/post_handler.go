@@ -5,63 +5,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"hobby-blog/internal/dto/request"
-	"hobby-blog/internal/model"
 	"hobby-blog/internal/service"
 )
 
 type PostHandler struct {
 	service *service.PostService
-}
-
-type PostSearchQuery struct {
-	Title    string `form:"title"`
-	UserName string `form:"user_name"`
-	Category string `form:"category"`
-	Limit    int    `form:"limit"`
-	Offset   int    `form:"offset"`
-}
-
-type CreatePostRequest struct {
-	Title      string `json:"title" binding:"required,max=255"`
-	Content    string `json:"content" binding:"required"`
-	CategoryID uint   `json:"category_id" binding:"required"`
-}
-
-type UpdatePostRequest struct {
-	Title      string       `json:"title" binding:"required,max=255"`
-	Content    string       `json:"content" binding:"required"`
-	CategoryID uint         `json:"category_id" binding:"required"`
-	Status     model.Status `json:"status" binding:"required"`
-}
-
-func (q PostSearchQuery) ToRequest() request.SearchPostQuery {
-	return request.SearchPostQuery{
-		Title:    q.Title,
-		UserName: q.UserName,
-		Category: q.Category,
-		Limit:    q.Limit,
-		Offset:   q.Offset,
-	}
-}
-
-func (r CreatePostRequest) ToRequest(userID uint) request.CreatePostInput {
-	return request.CreatePostInput{
-		Title:      r.Title,
-		Content:    r.Content,
-		CategoryID: r.CategoryID,
-		UserID:     userID,
-	}
-}
-
-func (r UpdatePostRequest) ToRequest(id uint, userID uint) request.UpdatePostInput {
-	return request.UpdatePostInput{
-		ID:         id,
-		Title:      r.Title,
-		Content:    r.Content,
-		CategoryID: r.CategoryID,
-		UserID:     userID,
-		Status:     r.Status,
-	}
 }
 
 func NewPostHandler(service *service.PostService) *PostHandler {
@@ -71,14 +19,14 @@ func NewPostHandler(service *service.PostService) *PostHandler {
 }
 
 func (h *PostHandler) Index(c *gin.Context) {
-	var q PostSearchQuery
+	var q request.PostSearchRequest
 
 	if err := c.ShouldBindQuery(&q); err != nil {
 		respondError(c, 400, "invalid query")
 		return
 	}
 
-	posts, err := h.service.SearchPosts(q.ToRequest())
+	posts, err := h.service.SearchPosts(q.ToInput())
 
 	if err != nil {
 		respondError(c, 500, "failed to fetch posts")
@@ -111,7 +59,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 }
 
 func (h *PostHandler) Create(c *gin.Context) {
-	var req CreatePostRequest
+	var req request.CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respondError(c, 400, "invalid request")
@@ -124,7 +72,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.CreatePost(req.ToRequest(uid))
+	err := h.service.CreatePost(req.ToInput(uid))
 
 	if err != nil {
 		respondError(c, 500, "failed")
@@ -137,7 +85,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 }
 
 func (h *PostHandler) Update(c *gin.Context) {
-	var req UpdatePostRequest
+	var req request.UpdatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respondError(c, 400, "invalid request")
@@ -157,7 +105,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedPost, err := h.service.UpdatePost(req.ToRequest(postID, uid))
+	updatedPost, err := h.service.UpdatePost(req.ToInput(postID, uid))
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
