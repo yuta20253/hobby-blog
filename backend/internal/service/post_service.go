@@ -14,15 +14,6 @@ type PostService struct {
 	repo repository.PostRepository
 }
 
-type PostDetailResponse struct {
-	ID         uint                         `json:"id"`
-	Title      string                       `json:"title"`
-	Content    string                       `json:"content"`
-	User       response.PostUserResponse    `json:"user"`
-	Category   response.CategoryResponse    `json:"category"`
-	MediaFiles []response.MediaFileResponse `json:"media_files"`
-}
-
 func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
@@ -56,7 +47,7 @@ func (s *PostService) SearchPosts(q request.SearchPostQuery) ([]response.PostRes
 	return res, nil
 }
 
-func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
+func (s *PostService) GetPost(id uint) (*response.PostDetailResponse, error) {
 	post, err := s.repo.Get(id)
 
 	if err != nil {
@@ -66,7 +57,7 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		return nil, err
 	}
 
-	return &PostDetailResponse{
+	return &response.PostDetailResponse{
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
@@ -87,7 +78,7 @@ func (s *PostService) CreatePost(input request.CreatePostInput) error {
 	return s.repo.Create(input)
 }
 
-func (s *PostService) UpdatePost(input request.UpdatePostInput) (*PostDetailResponse, error) {
+func (s *PostService) UpdatePost(input request.UpdatePostInput) (*response.PostDetailResponse, error) {
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
@@ -107,7 +98,7 @@ func (s *PostService) UpdatePost(input request.UpdatePostInput) (*PostDetailResp
 		return nil, err
 	}
 
-	return &PostDetailResponse{
+	return &response.PostDetailResponse{
 		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
