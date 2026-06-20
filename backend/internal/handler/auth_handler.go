@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"errors"
+
 	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/dto/request"
+	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/service"
 )
 
@@ -47,7 +50,12 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	result, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		respondError(c, 401, "invalid credentials")
+		if errors.Is(err, appErrors.ErrUnauthorized) {
+			respondError(c, 401, "invalid credentials")
+			return
+		}
+
+		respondError(c, 500, "failed")
 		return
 	}
 
