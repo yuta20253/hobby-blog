@@ -3,8 +3,8 @@ package service
 import (
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/dto/request"
 	"hobby-blog/internal/dto/response"
+	"hobby-blog/internal/service/input"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/repository"
@@ -18,7 +18,7 @@ func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q request.SearchPostQuery) ([]response.PostResponse, error) {
+func (s *PostService) SearchPosts(q input.SearchPostQuery) ([]response.PostResponse, error) {
 	posts, err := s.repo.Search(q)
 
 	if err != nil {
@@ -41,11 +41,11 @@ func (s *PostService) GetPost(id uint) (*response.PostDetailResponse, error) {
 	return response.NewPostDetailResponse(post), nil
 }
 
-func (s *PostService) CreatePost(input request.CreatePostInput) error {
+func (s *PostService) CreatePost(input input.CreatePostInput) error {
 	return s.repo.Create(input)
 }
 
-func (s *PostService) UpdatePost(input request.UpdatePostInput) (*response.PostDetailResponse, error) {
+func (s *PostService) UpdatePost(input input.UpdatePostInput) (*response.PostDetailResponse, error) {
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {

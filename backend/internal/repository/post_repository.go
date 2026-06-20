@@ -2,7 +2,7 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"hobby-blog/internal/dto/request"
+	"hobby-blog/internal/service/input"
 	"hobby-blog/internal/model"
 )
 
@@ -11,10 +11,10 @@ type postRepository struct {
 }
 
 type PostRepository interface {
-	Search(request.SearchPostQuery) ([]model.Post, error)
+	Search(input.SearchPostQuery) ([]model.Post, error)
 	Get(uint) (model.Post, error)
-	Create(request.CreatePostInput) error
-	Update(request.UpdatePostInput) (model.Post, error)
+	Create(input.CreatePostInput) error
+	Update(input.UpdatePostInput) (model.Post, error)
 	Delete(uint, uint) error
 	GetMyPostsByUserID(uint) ([]model.Post, error)
 	FindByID(uint) (model.Post, error)
@@ -24,7 +24,7 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 	return &postRepository{db: db}
 }
 
-func (r *postRepository) Search(q request.SearchPostQuery) ([]model.Post, error) {
+func (r *postRepository) Search(q input.SearchPostQuery) ([]model.Post, error) {
 	var posts []model.Post
 
 	query := r.db.
@@ -69,7 +69,7 @@ func (r *postRepository) Get(id uint) (model.Post, error) {
 	return post, err
 }
 
-func (r *postRepository) Create(param request.CreatePostInput) error {
+func (r *postRepository) Create(param input.CreatePostInput) error {
 	p := model.Post{
 		UserID:     param.UserID,
 		CategoryID: param.CategoryID,
@@ -81,7 +81,7 @@ func (r *postRepository) Create(param request.CreatePostInput) error {
 	return r.db.Create(&p).Error
 }
 
-func (r *postRepository) Update(param request.UpdatePostInput) (model.Post, error) {
+func (r *postRepository) Update(param input.UpdatePostInput) (model.Post, error) {
 	var post model.Post
 	result := r.db.Model(&model.Post{}).
 		Where("id = ? AND user_id = ?", param.ID, param.UserID).

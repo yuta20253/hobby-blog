@@ -1,6 +1,9 @@
 package request
 
-import "hobby-blog/internal/model"
+import (
+	"hobby-blog/internal/model"
+	"hobby-blog/internal/service/input"
+)
 
 type PostSearchRequest struct {
 	Title    string `form:"title"`
@@ -23,8 +26,8 @@ type UpdatePostRequest struct {
 	Status     model.Status `json:"status" binding:"required"`
 }
 
-func (q PostSearchRequest) ToInput() SearchPostQuery {
-	return SearchPostQuery{
+func (q PostSearchRequest) ToInput() input.SearchPostQuery {
+	return input.SearchPostQuery{
 		Title:    q.Title,
 		UserName: q.UserName,
 		Category: q.Category,
@@ -33,8 +36,8 @@ func (q PostSearchRequest) ToInput() SearchPostQuery {
 	}
 }
 
-func (r CreatePostRequest) ToInput(userID uint) CreatePostInput {
-	return CreatePostInput{
+func (r CreatePostRequest) ToInput(userID uint) input.CreatePostInput {
+	return input.CreatePostInput{
 		Title:      r.Title,
 		Content:    r.Content,
 		CategoryID: r.CategoryID,
@@ -42,8 +45,8 @@ func (r CreatePostRequest) ToInput(userID uint) CreatePostInput {
 	}
 }
 
-func (r UpdatePostRequest) ToInput(id uint, userID uint) UpdatePostInput {
-	return UpdatePostInput{
+func (r UpdatePostRequest) ToInput(id uint, userID uint) input.UpdatePostInput {
+	return input.UpdatePostInput{
 		ID:         id,
 		Title:      r.Title,
 		Content:    r.Content,
@@ -51,28 +54,4 @@ func (r UpdatePostRequest) ToInput(id uint, userID uint) UpdatePostInput {
 		UserID:     userID,
 		Status:     r.Status,
 	}
-}
-
-type SearchPostQuery struct {
-	Title    string
-	UserName string
-	Category string
-	Limit    int
-	Offset   int
-}
-
-type CreatePostInput struct {
-	Title      string
-	Content    string
-	CategoryID uint
-	UserID     uint
-}
-
-type UpdatePostInput struct {
-	ID         uint
-	Title      string
-	Content    string
-	CategoryID uint
-	UserID     uint
-	Status     model.Status
 }
