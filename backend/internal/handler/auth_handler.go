@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"errors"
-
 	"github.com/gin-gonic/gin"
 	"hobby-blog/internal/dto/request"
-	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/service"
 )
 
@@ -50,12 +47,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	result, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		if errors.Is(err, appErrors.ErrUnauthorized) {
-			respondError(c, 401, "invalid credentials")
-			return
-		}
-
-		respondError(c, 500, "failed")
+		handleError(c, err)
 		return
 	}
 
@@ -80,7 +72,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 
 	user, err := h.service.GetUserByID(uid)
 	if err != nil {
-		respondError(c, 404, "user not found")
+		handleError(c, err)
 		return
 	}
 

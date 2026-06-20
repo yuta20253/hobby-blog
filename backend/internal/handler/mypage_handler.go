@@ -25,7 +25,7 @@ func (h *MypageHandler) Show(c *gin.Context) {
 	mypage, err := h.service.GetMyPage(uid)
 
 	if err != nil {
-		respondError(c, 404, "mypage not found")
+		handleError(c, err)
 		return
 	}
 
