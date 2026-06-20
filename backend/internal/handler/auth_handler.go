@@ -20,14 +20,14 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	var req request.SignUpRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
 	result, err := h.service.SignUp(req.Name, req.Email, req.Password)
 
 	if err != nil {
-		respondError(c, 500, "failed")
+		handleError(c, err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req request.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
