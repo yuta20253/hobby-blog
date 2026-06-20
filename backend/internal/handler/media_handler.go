@@ -31,7 +31,7 @@ func (h *MediaHandler) UploadMedia(c *gin.Context) {
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		respondError(c, 400, "file required")
+		handleError(c, err)
 		return
 	}
 
