@@ -2,22 +2,12 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"hobby-blog/internal/dto/request"
 	"hobby-blog/internal/service"
 )
 
 type AuthHandler struct {
 	service *service.AuthService
-}
-
-type SignUpRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 func NewAuthHandler(service *service.AuthService) *AuthHandler {
@@ -27,7 +17,7 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(c *gin.Context) {
-	var req SignUpRequest
+	var req request.SignUpRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respondError(c, 400, "invalid request")
@@ -48,7 +38,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req LoginRequest
+	var req request.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		respondError(c, 400, "invalid request")
