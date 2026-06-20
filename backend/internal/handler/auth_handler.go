@@ -24,7 +24,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.SignUp(req.Name, req.Email, req.Password)
+	result, err := h.service.SignUp(req.ToInput())
 
 	if err != nil {
 		handleError(c, err)
@@ -45,7 +45,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	result, err := h.service.Login(req.Email, req.Password)
+	result, err := h.service.Login(req.ToInput())
 	if err != nil {
 		handleError(c, err)
 		return

@@ -9,6 +9,7 @@ import (
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/pkg/password"
 	"hobby-blog/internal/repository"
+	serviceInput "hobby-blog/internal/service/input"
 	"strings"
 )
 
@@ -20,16 +21,16 @@ func NewAuthService(repo repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(name, email, rawPassword string) (*response.AuthResult, error) {
-	hashedPassword, err := password.Hash(rawPassword)
+func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResult, error) {
+	hashedPassword, err := password.Hash(input.Password)
 
 	if err != nil {
 		return nil, err
 	}
 
 	user := model.User{
-		Name:         name,
-		Email:        email,
+		Name:         input.Name,
+		Email:        input.Email,
 		PasswordHash: hashedPassword,
 	}
 
@@ -51,8 +52,8 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*response.AuthRes
 	}, nil
 }
 
-func (s *AuthService) Login(email, rawPassword string) (*response.AuthResult, error) {
-	user, err := s.repo.FindByEmail(email)
+func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResult, error) {
+	user, err := s.repo.FindByEmail(input.Email)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -61,7 +62,7 @@ func (s *AuthService) Login(email, rawPassword string) (*response.AuthResult, er
 		return nil, err
 	}
 
-	if err := password.Compare(user.PasswordHash, rawPassword); err != nil {
+	if err := password.Compare(user.PasswordHash, input.Password); err != nil {
 		return nil, appErrors.ErrUnauthorized
 	}
 
