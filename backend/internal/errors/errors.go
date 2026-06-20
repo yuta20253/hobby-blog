@@ -1,12 +1,20 @@
 package errors
 
-import "errors"
+import "net/http"
+
+type AppError struct {
+	Code int
+	Message string
+}
+
+func (e *AppError) Error() string {
+	return e.Message
+}
 
 var (
-	ErrNotFound         = errors.New("not found")
-	ErrForbidden        = errors.New("forbidden")
-	ErrUnauthorized     = errors.New("unauthorized")
-	ErrConflict         = errors.New("conflict")
-	ErrInvalidInput     = errors.New("invalid input")
-	ErrUnsupportedMedia = errors.New("unsupported media")
+	ErrNotFound         = &AppError{Code: http.StatusNotFound, Message: "not found"}
+	ErrForbidden        = &AppError{Code: http.StatusForbidden, Message: "forbidden"}
+	ErrUnauthorized     = &AppError{Code: http.StatusUnauthorized, Message: "unauthorized"}
+	ErrConflict         = &AppError{Code: http.StatusConflict, Message: "conflict"}
+	ErrInvalidInput     = &AppError{Code: http.StatusBadRequest, Message: "invalid input"}
 )

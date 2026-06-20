@@ -62,7 +62,7 @@ func (s *AuthService) Login(email, rawPassword string) (*response.AuthResult, er
 	}
 
 	if err := password.Compare(user.PasswordHash, rawPassword); err != nil {
-		return nil, err
+		return nil, appErrors.ErrUnauthorized
 	}
 
 	token, err := auth.GenerateToken(user.ID)
