@@ -4,11 +4,11 @@ import (
 	"errors"
 	"net/http"
 
-	appErrors "hobby-blog/internal/errors"
 	"github.com/gin-gonic/gin"
+	appErrors "hobby-blog/internal/errors"
 )
 
-func handleError(c *gin.Context, err error)  {
+func handleError(c *gin.Context, err error) {
 	var appErr *appErrors.AppError
 
 	if errors.As(err, &appErr) {

@@ -2,8 +2,8 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"hobby-blog/internal/service/input"
 	"hobby-blog/internal/model"
+	"hobby-blog/internal/service/input"
 )
 
 type postRepository struct {

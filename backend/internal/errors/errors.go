@@ -3,7 +3,7 @@ package errors
 import "net/http"
 
 type AppError struct {
-	Code int
+	Code    int
 	Message string
 }
 
