@@ -23,9 +23,10 @@ func handleError(c *gin.Context, err error) {
 	var validationErr validator.ValidationErrors
 
 	if errors.As(err, &validationErr) {
-		c.JSON(appErr.Code, response.ErrorResponse{
+		c.JSON(http.StatusBadRequest, response.ErrorResponse{
 			Error: "invalid request",
 		})
+		return
 	}
 
 	c.Error(err)
