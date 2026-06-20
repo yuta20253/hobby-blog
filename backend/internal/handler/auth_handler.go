@@ -2,22 +2,12 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"hobby-blog/internal/dto/request"
 	"hobby-blog/internal/service"
 )
 
 type AuthHandler struct {
 	service *service.AuthService
-}
-
-type SignUpRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
 }
 
 func NewAuthHandler(service *service.AuthService) *AuthHandler {
@@ -27,44 +17,38 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) SignUp(c *gin.Context) {
-	var req SignUpRequest
+	var req request.SignUpRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
-	result, err := h.service.SignUp(req.Name, req.Email, req.Password)
+	result, err := h.service.SignUp(req.ToInput())
 
 	if err != nil {
-		respondError(c, 500, "failed")
+		handleError(c, err)
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"user":  result.User,
-		"token": result.Token,
-	})
+	c.JSON(200, result)
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
-	var req LoginRequest
+	var req request.LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
-	result, err := h.service.Login(req.Email, req.Password)
+	result, err := h.service.Login(req.ToInput())
 	if err != nil {
-		respondError(c, 401, "invalid credentials")
+		handleError(c, err)
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"user":  result.User,
-		"token": result.Token,
-	})
+	c.JSON(200, result)
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {
@@ -82,7 +66,7 @@ func (h *AuthHandler) Me(c *gin.Context) {
 
 	user, err := h.service.GetUserByID(uid)
 	if err != nil {
-		respondError(c, 404, "user not found")
+		handleError(c, err)
 		return
 	}
 

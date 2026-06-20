@@ -1,66 +1,14 @@
 package handler
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
-	"hobby-blog/internal/domain/post"
+
+	"hobby-blog/internal/dto/request"
 	"hobby-blog/internal/service"
 )
 
 type PostHandler struct {
 	service *service.PostService
-}
-
-type PostSearchQuery struct {
-	Title    string `form:"title"`
-	UserName string `form:"user_name"`
-	Category string `form:"category"`
-	Limit    int    `form:"limit"`
-	Offset   int    `form:"offset"`
-}
-
-type CreatePostRequest struct {
-	Title      string `json:"title" binding:"required,max=255"`
-	Content    string `json:"content" binding:"required"`
-	CategoryID uint   `json:"category_id" binding:"required"`
-}
-
-type UpdatePostRequest struct {
-	Title      string      `json:"title" binding:"required,max=255"`
-	Content    string      `json:"content" binding:"required"`
-	CategoryID uint        `json:"category_id" binding:"required"`
-	Status     post.Status `json:"status" binding:"required"`
-}
-
-func (q PostSearchQuery) ToDomain() post.SearchQuery {
-	return post.SearchQuery{
-		Title:    q.Title,
-		UserName: q.UserName,
-		Category: q.Category,
-		Limit:    q.Limit,
-		Offset:   q.Offset,
-	}
-}
-
-func (r CreatePostRequest) ToDomain(userID uint) post.CreateInput {
-	return post.CreateInput{
-		Title:      r.Title,
-		Content:    r.Content,
-		CategoryID: r.CategoryID,
-		UserID:     userID,
-	}
-}
-
-func (r UpdatePostRequest) ToDomain(id uint, userID uint) post.UpdateInput {
-	return post.UpdateInput{
-		ID:         id,
-		Title:      r.Title,
-		Content:    r.Content,
-		CategoryID: r.CategoryID,
-		UserID:     userID,
-		Status:     r.Status,
-	}
 }
 
 func NewPostHandler(service *service.PostService) *PostHandler {
@@ -70,17 +18,17 @@ func NewPostHandler(service *service.PostService) *PostHandler {
 }
 
 func (h *PostHandler) Index(c *gin.Context) {
-	var q PostSearchQuery
+	var q request.PostSearchRequest
 
 	if err := c.ShouldBindQuery(&q); err != nil {
-		respondError(c, 400, "invalid query")
+		handleError(c, err)
 		return
 	}
 
-	posts, err := h.service.SearchPosts(q.ToDomain())
+	posts, err := h.service.SearchPosts(q.ToInput())
 
 	if err != nil {
-		respondError(c, 500, "failed to fetch posts")
+		handleError(c, err)
 		return
 	}
 
@@ -100,7 +48,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 	post, err := h.service.GetPost(postId)
 
 	if err != nil {
-		respondError(c, 404, "failed to fetch post")
+		handleError(c, err)
 		return
 	}
 
@@ -110,10 +58,10 @@ func (h *PostHandler) Show(c *gin.Context) {
 }
 
 func (h *PostHandler) Create(c *gin.Context) {
-	var req CreatePostRequest
+	var req request.CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
@@ -123,10 +71,10 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.CreatePost(req.ToDomain(uid))
+	err := h.service.CreatePost(req.ToInput(uid))
 
 	if err != nil {
-		respondError(c, 500, "failed")
+		handleError(c, err)
 		return
 	}
 
@@ -136,17 +84,16 @@ func (h *PostHandler) Create(c *gin.Context) {
 }
 
 func (h *PostHandler) Update(c *gin.Context) {
-	var req UpdatePostRequest
+	var req request.UpdatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		respondError(c, 400, "invalid request")
+		handleError(c, err)
 		return
 	}
 
 	uid, ok := getUserID(c)
 
 	if !ok {
-		c.JSON(500, gin.H{"error": "failed"})
 		return
 	}
 
@@ -156,15 +103,10 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedPost, err := h.service.UpdatePost(req.ToDomain(postID, uid))
+	updatedPost, err := h.service.UpdatePost(req.ToInput(postID, uid))
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			respondError(c, 404, "not found")
-			return
-		}
-
-		respondError(c, 500, "failed")
+		handleError(c, err)
 		return
 	}
 
@@ -177,7 +119,6 @@ func (h *PostHandler) Delete(c *gin.Context) {
 	uid, ok := getUserID(c)
 
 	if !ok {
-		respondError(c, 500, "invalid user id")
 		return
 	}
 
@@ -190,11 +131,7 @@ func (h *PostHandler) Delete(c *gin.Context) {
 	err := h.service.DeletePost(postID, uid)
 
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			respondError(c, 404, "not found")
-			return
-		}
-		respondError(c, 500, "invalid id")
+		handleError(c, err)
 		return
 	}
 

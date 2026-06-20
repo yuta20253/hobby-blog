@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/dto"
+	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/repository"
 )
@@ -13,17 +13,6 @@ type MypageService struct {
 	postRepo repository.PostRepository
 }
 
-type MypageResponse struct {
-	User  UserResponse       `json:"user"`
-	Posts []dto.PostResponse `json:"posts"`
-}
-
-type UserResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
 func NewMypageService(userRepo repository.UserRepository, postRepo repository.PostRepository) *MypageService {
 	return &MypageService{
 		userRepo: userRepo,
@@ -31,7 +20,7 @@ func NewMypageService(userRepo repository.UserRepository, postRepo repository.Po
 	}
 }
 
-func (s *MypageService) GetMyPage(id uint) (*MypageResponse, error) {
+func (s *MypageService) GetMyPage(id uint) (*response.MypageResponse, error) {
 	user, err := s.userRepo.FindByID(id)
 
 	if err != nil {
@@ -48,32 +37,5 @@ func (s *MypageService) GetMyPage(id uint) (*MypageResponse, error) {
 		return nil, err
 	}
 
-	postResponses := make([]dto.PostResponse, 0, len(posts))
-
-	for _, p := range posts {
-		postResponses = append(postResponses, dto.PostResponse{
-			ID:      p.ID,
-			Title:   p.Title,
-			Content: p.Content,
-			User: dto.PostUserResponse{
-				ID:    p.User.ID,
-				Name:  p.User.Name,
-				Email: p.User.Email,
-			},
-			Category: dto.CategoryResponse{
-				ID:   p.Category.ID,
-				Name: p.Category.Name,
-			},
-			MediaFiles: dto.NewMediaFileResponses(p.MediaFiles),
-		})
-	}
-
-	return &MypageResponse{
-		User: UserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-		},
-		Posts: postResponses,
-	}, nil
+	return response.NewMypageResponse(user, posts), nil
 }

@@ -36,9 +36,3 @@ func getParamID(c *gin.Context, key string) (uint, bool) {
 
 	return uint(id), true
 }
-
-func respondError(c *gin.Context, status int, message string) {
-	c.JSON(status, gin.H{
-		"error": message,
-	})
-}

@@ -2,8 +2,8 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"hobby-blog/internal/domain/post"
 	"hobby-blog/internal/model"
+	"hobby-blog/internal/service/input"
 )
 
 type postRepository struct {
@@ -11,10 +11,10 @@ type postRepository struct {
 }
 
 type PostRepository interface {
-	Search(post.SearchQuery) ([]model.Post, error)
+	Search(input.SearchPostQuery) ([]model.Post, error)
 	Get(uint) (model.Post, error)
-	Create(post.CreateInput) error
-	Update(post.UpdateInput) (model.Post, error)
+	Create(input.CreatePostInput) error
+	Update(input.UpdatePostInput) (model.Post, error)
 	Delete(uint, uint) error
 	GetMyPostsByUserID(uint) ([]model.Post, error)
 	FindByID(uint) (model.Post, error)
@@ -24,7 +24,7 @@ func NewPostRepository(db *gorm.DB) PostRepository {
 	return &postRepository{db: db}
 }
 
-func (r *postRepository) Search(q post.SearchQuery) ([]model.Post, error) {
+func (r *postRepository) Search(q input.SearchPostQuery) ([]model.Post, error) {
 	var posts []model.Post
 
 	query := r.db.
@@ -69,19 +69,19 @@ func (r *postRepository) Get(id uint) (model.Post, error) {
 	return post, err
 }
 
-func (r *postRepository) Create(param post.CreateInput) error {
+func (r *postRepository) Create(param input.CreatePostInput) error {
 	p := model.Post{
 		UserID:     param.UserID,
 		CategoryID: param.CategoryID,
 		Title:      param.Title,
 		Content:    param.Content,
-		Status:     post.StatusDraft,
+		Status:     model.StatusDraft,
 	}
 
 	return r.db.Create(&p).Error
 }
 
-func (r *postRepository) Update(param post.UpdateInput) (model.Post, error) {
+func (r *postRepository) Update(param input.UpdatePostInput) (model.Post, error) {
 	var post model.Post
 	result := r.db.Model(&model.Post{}).
 		Where("id = ? AND user_id = ?", param.ID, param.UserID).

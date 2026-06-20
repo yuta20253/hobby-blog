@@ -1,6 +1,4 @@
-package dto
-
-import "hobby-blog/internal/domain/media"
+package response
 
 type PostResponse struct {
 	ID         uint                `json:"id"`
@@ -20,11 +18,4 @@ type PostUserResponse struct {
 	ID    uint   `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
-}
-
-type MediaFileResponse struct {
-	ID       uint       `json:"id"`
-	Type     media.Type `json:"type"`
-	FilePath string     `json:"file_path"`
-	FileName string     `json:"file_name"`
 }

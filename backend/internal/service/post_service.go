@@ -3,59 +3,32 @@ package service
 import (
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/domain/post"
-	"hobby-blog/internal/dto"
+	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
+	"hobby-blog/internal/model"
 	"hobby-blog/internal/repository"
+	"hobby-blog/internal/service/input"
 )
 
 type PostService struct {
 	repo repository.PostRepository
 }
 
-type PostDetailResponse struct {
-	ID         uint                    `json:"id"`
-	Title      string                  `json:"title"`
-	Content    string                  `json:"content"`
-	User       dto.PostUserResponse    `json:"user"`
-	Category   dto.CategoryResponse    `json:"category"`
-	MediaFiles []dto.MediaFileResponse `json:"media_files"`
-}
-
 func NewPostService(repo repository.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(q post.SearchQuery) ([]dto.PostResponse, error) {
+func (s *PostService) SearchPosts(q input.SearchPostQuery) ([]response.PostResponse, error) {
 	posts, err := s.repo.Search(q)
 
 	if err != nil {
 		return nil, err
 	}
 
-	res := make([]dto.PostResponse, 0, len(posts))
-
-	for _, post := range posts {
-		res = append(res, dto.PostResponse{
-			ID:    post.ID,
-			Title: post.Title,
-			User: dto.PostUserResponse{
-				ID:    post.User.ID,
-				Name:  post.User.Name,
-				Email: post.User.Email,
-			},
-			Category: dto.CategoryResponse{
-				ID:   post.Category.ID,
-				Name: post.Category.Name,
-			},
-			MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
-		})
-	}
-
-	return res, nil
+	return response.NewPostResponses(posts), nil
 }
 
-func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
+func (s *PostService) GetPost(id uint) (*response.PostDetailResponse, error) {
 	post, err := s.repo.Get(id)
 
 	if err != nil {
@@ -65,28 +38,14 @@ func (s *PostService) GetPost(id uint) (*PostDetailResponse, error) {
 		return nil, err
 	}
 
-	return &PostDetailResponse{
-		ID:      post.ID,
-		Title:   post.Title,
-		Content: post.Content,
-		User: dto.PostUserResponse{
-			ID:    post.User.ID,
-			Name:  post.User.Name,
-			Email: post.User.Email,
-		},
-		Category: dto.CategoryResponse{
-			ID:   post.Category.ID,
-			Name: post.Category.Name,
-		},
-		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
-	}, nil
+	return response.NewPostDetailResponse(post), nil
 }
 
-func (s *PostService) CreatePost(input post.CreateInput) error {
+func (s *PostService) CreatePost(input input.CreatePostInput) error {
 	return s.repo.Create(input)
 }
 
-func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, error) {
+func (s *PostService) UpdatePost(input input.UpdatePostInput) (*response.PostDetailResponse, error) {
 	currentPost, err := s.repo.Get(input.ID)
 
 	if err != nil {
@@ -96,7 +55,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		return nil, err
 	}
 
-	if input.Status == post.StatusPublished && currentPost.Status != post.StatusDraft {
+	if input.Status == model.StatusPublished && currentPost.Status != model.StatusDraft {
 		return nil, appErrors.ErrInvalidInput
 	}
 
@@ -106,20 +65,7 @@ func (s *PostService) UpdatePost(input post.UpdateInput) (*PostDetailResponse, e
 		return nil, err
 	}
 
-	return &PostDetailResponse{
-		ID:      post.ID,
-		Title:   post.Title,
-		Content: post.Content,
-		User: dto.PostUserResponse{
-			ID:   post.User.ID,
-			Name: post.User.Name,
-		},
-		Category: dto.CategoryResponse{
-			ID:   post.Category.ID,
-			Name: post.Category.Name,
-		},
-		MediaFiles: dto.NewMediaFileResponses(post.MediaFiles),
-	}, nil
+	return response.NewPostDetailResponse(post), nil
 }
 
 func (s *PostService) DeletePost(id uint, userID uint) error {

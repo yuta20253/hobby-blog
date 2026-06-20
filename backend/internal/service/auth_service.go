@@ -4,10 +4,12 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"hobby-blog/internal/auth"
+	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/model"
 	"hobby-blog/internal/pkg/password"
 	"hobby-blog/internal/repository"
+	serviceInput "hobby-blog/internal/service/input"
 	"strings"
 )
 
@@ -15,31 +17,20 @@ type AuthService struct {
 	repo repository.UserRepository
 }
 
-type AuthUserResponse struct {
-	ID    uint   `json:"id"`
-	Name  string `json:"name"`
-	Email string `json:"email"`
-}
-
-type AuthResult struct {
-	User  AuthUserResponse `json:"user"`
-	Token string           `json:"token"`
-}
-
 func NewAuthService(repo repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, error) {
-	hashedPassword, err := password.Hash(rawPassword)
+func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResponse, error) {
+	hashedPassword, err := password.Hash(input.Password)
 
 	if err != nil {
 		return nil, err
 	}
 
 	user := model.User{
-		Name:         name,
-		Email:        email,
+		Name:         input.Name,
+		Email:        input.Email,
 		PasswordHash: hashedPassword,
 	}
 
@@ -55,18 +46,14 @@ func (s *AuthService) SignUp(name, email, rawPassword string) (*AuthResult, erro
 		return nil, err
 	}
 
-	return &AuthResult{
-		User: AuthUserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-		},
+	return &response.AuthResponse{
+		User:  response.NewAuthUserResponse(user),
 		Token: token,
 	}, nil
 }
 
-func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
-	user, err := s.repo.FindByEmail(email)
+func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResponse, error) {
+	user, err := s.repo.FindByEmail(input.Email)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -75,8 +62,8 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 		return nil, err
 	}
 
-	if err := password.Compare(user.PasswordHash, rawPassword); err != nil {
-		return nil, err
+	if err := password.Compare(user.PasswordHash, input.Password); err != nil {
+		return nil, appErrors.ErrUnauthorized
 	}
 
 	token, err := auth.GenerateToken(user.ID)
@@ -84,17 +71,13 @@ func (s *AuthService) Login(email, rawPassword string) (*AuthResult, error) {
 		return nil, err
 	}
 
-	return &AuthResult{
-		User: AuthUserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-		},
+	return &response.AuthResponse{
+		User:  response.NewAuthUserResponse(user),
 		Token: token,
 	}, nil
 }
 
-func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
+func (s *AuthService) GetUserByID(id uint) (*response.AuthUserResponse, error) {
 	user, err := s.repo.FindByID(id)
 
 	if err != nil {
@@ -104,11 +87,9 @@ func (s *AuthService) GetUserByID(id uint) (*AuthUserResponse, error) {
 		return nil, err
 	}
 
-	return &AuthUserResponse{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
-	}, nil
+	resp := response.NewAuthUserResponse(user)
+
+	return &resp, nil
 }
 
 func isDuplicateError(err error) bool {
