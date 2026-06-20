@@ -31,10 +31,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"user":  result.User,
-		"token": result.Token,
-	})
+	c.JSON(200, result)
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
@@ -51,10 +48,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"user":  result.User,
-		"token": result.Token,
-	})
+	c.JSON(200, result)
 }
 
 func (h *AuthHandler) Logout(c *gin.Context) {

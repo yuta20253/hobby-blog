@@ -21,7 +21,7 @@ func NewAuthService(repo repository.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResult, error) {
+func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResponse, error) {
 	hashedPassword, err := password.Hash(input.Password)
 
 	if err != nil {
@@ -46,13 +46,13 @@ func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResu
 		return nil, err
 	}
 
-	return &response.AuthResult{
+	return &response.AuthResponse{
 		User:  response.NewAuthUserResponse(user),
 		Token: token,
 	}, nil
 }
 
-func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResult, error) {
+func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResponse, error) {
 	user, err := s.repo.FindByEmail(input.Email)
 
 	if err != nil {
@@ -71,7 +71,7 @@ func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResult
 		return nil, err
 	}
 
-	return &response.AuthResult{
+	return &response.AuthResponse{
 		User:  response.NewAuthUserResponse(user),
 		Token: token,
 	}, nil

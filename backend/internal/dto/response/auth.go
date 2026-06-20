@@ -6,7 +6,7 @@ type AuthUserResponse struct {
 	Email string `json:"email"`
 }
 
-type AuthResult struct {
+type AuthResponse struct {
 	User  AuthUserResponse `json:"user"`
 	Token string           `json:"token"`
 }
