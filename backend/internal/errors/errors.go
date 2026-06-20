@@ -17,4 +17,8 @@ var (
 	ErrUnauthorized     = &AppError{Code: http.StatusUnauthorized, Message: "unauthorized"}
 	ErrConflict         = &AppError{Code: http.StatusConflict, Message: "conflict"}
 	ErrInvalidInput     = &AppError{Code: http.StatusBadRequest, Message: "invalid input"}
+	ErrUnsupportedMedia = &AppError{
+		Code:    http.StatusUnsupportedMediaType,
+		Message: "unsupported media type",
+	}
 )
