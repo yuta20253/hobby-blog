@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"github.com/go-playground/validator/v10"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,9 +20,17 @@ func handleError(c *gin.Context, err error) {
 		return
 	}
 
+	var validationErr validator.ValidationErrors
+
+	if errors.As(err, &validationErr) {
+		c.JSON(appErr.Code, response.ErrorResponse{
+			Error: "invalid request",
+		})
+	}
+
 	c.Error(err)
 
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"error": "internal server error",
+	c.JSON(http.StatusInternalServerError, response.ErrorResponse{
+		Error: "internal server error",
 	})
 }
