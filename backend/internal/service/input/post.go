@@ -23,5 +23,5 @@ type UpdatePostInput struct {
 	Content    string
 	CategoryID uint
 	UserID     uint
-	Status     model.Status
+	Status     domain.Status
 }

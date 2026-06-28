@@ -23,7 +23,7 @@ type UpdatePostRequest struct {
 	Title      string       `json:"title" binding:"required,max=255"`
 	Content    string       `json:"content" binding:"required"`
 	CategoryID uint         `json:"category_id" binding:"required"`
-	Status     model.Status `json:"status" binding:"required"`
+	Status     domain.Status `json:"status" binding:"required"`
 }
 
 func (q PostSearchRequest) ToInput() input.SearchPostQuery {
