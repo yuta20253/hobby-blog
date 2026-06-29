@@ -1,8 +1,10 @@
-package domain
+package post
+
+import "hobby-blog/internal/domain/user"
 
 type Post struct {
 	ID uint
-	UserID UserID
+	UserID user.ID
 	CategoryID uint
 	Title string
 	Content string
