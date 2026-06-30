@@ -1,11 +1,11 @@
 package response
 
-import "hobby-blog/internal/model"
+import domainUser "hobby-blog/internal/domain/user"
 
-func NewAuthUserResponse(user model.User) AuthUserResponse {
+func NewAuthUserResponse(user *domainUser.User) AuthUserResponse {
 	return AuthUserResponse{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
+		ID:    uint(user.ID),
+		Name:  user.Name.String(),
+		Email: user.Email.String(),
 	}
 }

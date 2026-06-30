@@ -6,42 +6,52 @@ import (
 	"hobby-blog/internal/auth"
 	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
-	"hobby-blog/internal/model"
 	"hobby-blog/internal/pkg/password"
-	"hobby-blog/internal/repository"
+	domainUser "hobby-blog/internal/domain/user"
 	serviceInput "hobby-blog/internal/service/input"
 	"strings"
+	"context"
 )
 
 type AuthService struct {
-	repo repository.UserRepository
+	repo domainUser.UserRepository
 }
 
-func NewAuthService(repo repository.UserRepository) *AuthService {
+func NewAuthService(repo domainUser.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResponse, error) {
+func (s *AuthService) SignUp(ctx context.Context, input serviceInput.SignUpInput) (*response.AuthResponse, error) {
 	hashedPassword, err := password.Hash(input.Password)
 
 	if err != nil {
 		return nil, err
 	}
 
-	user := model.User{
-		Name:         input.Name,
-		Email:        input.Email,
-		PasswordHash: hashedPassword,
+	name, err := domainUser.NewName(input.Name)
+	if err != nil {
+		return nil, err
 	}
 
-	if err := s.repo.Create(&user); err != nil {
+	email, err := domainUser.NewEmail(input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	user := domainUser.NewUser(
+		name,
+		email,
+		hashedPassword,
+	)
+
+	if err := s.repo.Create(ctx, user); err != nil {
 		if isDuplicateError(err) {
 			return nil, appErrors.ErrConflict
 		}
 		return nil, err
 	}
 
-	token, err := auth.GenerateToken(user.ID)
+	token, err := auth.GenerateToken(uint(user.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +62,13 @@ func (s *AuthService) SignUp(input serviceInput.SignUpInput) (*response.AuthResp
 	}, nil
 }
 
-func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthResponse, error) {
-	user, err := s.repo.FindByEmail(input.Email)
+func (s *AuthService) Login(ctx context.Context, input serviceInput.LoginInput) (*response.AuthResponse, error) {
+	email, err := domainUser.NewEmail(input.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repo.FindByEmail(ctx, email)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -66,7 +81,7 @@ func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthRespon
 		return nil, appErrors.ErrUnauthorized
 	}
 
-	token, err := auth.GenerateToken(user.ID)
+	token, err := auth.GenerateToken(uint(user.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +92,8 @@ func (s *AuthService) Login(input serviceInput.LoginInput) (*response.AuthRespon
 	}, nil
 }
 
-func (s *AuthService) GetUserByID(id uint) (*response.AuthUserResponse, error) {
-	user, err := s.repo.FindByID(id)
+func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*response.AuthUserResponse, error) {
+	user, err := s.repo.FindByID(ctx, domainUser.ID(id))
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

@@ -69,5 +69,12 @@ func (r *userRepository) Create(ctx context.Context, u *user.User) error {
 		Email: u.Email.String(),
 		PasswordHash: u.PasswordHash,
 	}
-	return r.db.WithContext(ctx).Create(&m).Error
+
+	if err := r.db.WithContext(ctx).Create(&m).Error; err != nil {
+		return nil
+	}
+
+	u.ID = user.ID(m.ID)
+
+	return nil
 }
