@@ -1,4 +1,4 @@
-package model
+package infrastructure
 
 import "gorm.io/gorm"
 
@@ -8,5 +8,5 @@ type User struct {
 	Email        string `gorm:"size:255;unique;not null" json:"email"`
 	PasswordHash string `gorm:"not null" json:"-"`
 
-	Posts []Post `json:"posts,omitempty"`
+	// Posts []Post `json:"posts,omitempty"`
 }

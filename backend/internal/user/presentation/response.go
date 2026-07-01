@@ -1,4 +1,4 @@
-package response
+package presentation
 
 type AuthUserResponse struct {
 	ID    uint   `json:"id"`

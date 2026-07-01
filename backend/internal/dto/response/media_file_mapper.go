@@ -1,8 +1,8 @@
 package response
 
-import "hobby-blog/internal/model"
+import postInfrastructureModel "hobby-blog/internal/post/infrastructure"
 
-func NewMediaFileResponse(f model.MediaFile) MediaFileResponse {
+func NewMediaFileResponse(f postInfrastructureModel.MediaFile) MediaFileResponse {
 	return MediaFileResponse{
 		ID:       f.ID,
 		Type:     f.Type,
@@ -11,7 +11,7 @@ func NewMediaFileResponse(f model.MediaFile) MediaFileResponse {
 	}
 }
 
-func NewMediaFileResponses(files []model.MediaFile) []MediaFileResponse {
+func NewMediaFileResponses(files []postInfrastructureModel.MediaFile) []MediaFileResponse {
 	res := make([]MediaFileResponse, 0, len(files))
 
 	for _, f := range files {

@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 	appErrors "hobby-blog/internal/errors"
-	"hobby-blog/internal/model"
+	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/uploader"
 )
@@ -48,7 +48,7 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 		return err
 	}
 
-	err = s.mediaRepo.Create(&model.MediaFile{
+	err = s.mediaRepo.Create(&postInfrastructureModel.MediaFile{
 		PostID:   postID,
 		Type:     mediaType,
 		FilePath: filePath,

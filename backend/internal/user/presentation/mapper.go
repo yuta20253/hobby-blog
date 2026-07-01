@@ -1,6 +1,6 @@
-package response
+package presentation
 
-import domainUser "hobby-blog/internal/domain/user"
+import domainUser "hobby-blog/internal/user/domain"
 
 func NewAuthUserResponse(user *domainUser.User) AuthUserResponse {
 	return AuthUserResponse{

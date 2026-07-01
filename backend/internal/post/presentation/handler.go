@@ -1,31 +1,40 @@
-package handler
+package presentation
 
 import (
 	"github.com/gin-gonic/gin"
 
-	"hobby-blog/internal/dto/request"
-	"hobby-blog/internal/service"
+	postApplication "hobby-blog/internal/post/application"
 )
 
 type PostHandler struct {
-	service *service.PostService
+	service *postApplication.PostService
 }
 
-func NewPostHandler(service *service.PostService) *PostHandler {
-	return &PostHandler{
-		service: service,
-	}
+func NewPostHandler(service *postApplication.PostService) *PostHandler {
+	return &PostHandler{service: service}
 }
 
 func (h *PostHandler) Index(c *gin.Context) {
-	var q request.PostSearchRequest
+	var q struct {
+		Title    string `form:"title"`
+		UserName string `form:"user_name"`
+		Category string `form:"category"`
+		Limit    int    `form:"limit"`
+		Offset   int    `form:"offset"`
+	}
 
 	if err := c.ShouldBindQuery(&q); err != nil {
-		handleError(c, err)
+		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	posts, err := h.service.SearchPosts(q.ToInput())
+	posts, err := h.service.SearchPosts(c.Request.Context(), postApplication.SearchPostQuery{
+		Title:    q.Title,
+		UserName: q.UserName,
+		Category: q.Category,
+		Limit:    q.Limit,
+		Offset:   q.Offset,
+	})
 
 	if err != nil {
 		handleError(c, err)
@@ -45,7 +54,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 		return
 	}
 
-	post, err := h.service.GetPost(postId)
+	post, err := h.service.GetPost(c.Request.Context(), postId)
 
 	if err != nil {
 		handleError(c, err)
@@ -58,7 +67,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 }
 
 func (h *PostHandler) Create(c *gin.Context) {
-	var req request.CreatePostRequest
+	var req CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(c, err)
@@ -71,7 +80,12 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	err := h.service.CreatePost(req.ToInput(uid))
+	_, err := h.service.CreatePost(c.Request.Context(), postApplication.CreatePostInput{
+		Title:      req.Title,
+		Content:    req.Content,
+		CategoryID: req.CategoryID,
+		UserID:     uid,
+	})
 
 	if err != nil {
 		handleError(c, err)
@@ -84,7 +98,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 }
 
 func (h *PostHandler) Update(c *gin.Context) {
-	var req request.UpdatePostRequest
+	var req UpdatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		handleError(c, err)
@@ -103,7 +117,13 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	updatedPost, err := h.service.UpdatePost(req.ToInput(postID, uid))
+	updatedPost, err := h.service.UpdatePost(c.Request.Context(), postApplication.UpdatePostInput{
+		ID:         postID,
+		Title:      req.Title,
+		Content:    req.Content,
+		CategoryID: req.CategoryID,
+		UserID:     uid,
+	})
 
 	if err != nil {
 		handleError(c, err)
@@ -128,7 +148,7 @@ func (h *PostHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	err := h.service.DeletePost(postID, uid)
+	err := h.service.DeletePost(c.Request.Context(), postID)
 
 	if err != nil {
 		handleError(c, err)

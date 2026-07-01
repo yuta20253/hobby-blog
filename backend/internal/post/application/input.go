@@ -1,6 +1,6 @@
-package input
+package application
 
-import "hobby-blog/internal/model"
+import postDomain "hobby-blog/internal/post/domain"
 
 type SearchPostQuery struct {
 	Title    string
@@ -23,5 +23,5 @@ type UpdatePostInput struct {
 	Content    string
 	CategoryID uint
 	UserID     uint
-	Status     domain.Status
+	Status     postDomain.Status
 }

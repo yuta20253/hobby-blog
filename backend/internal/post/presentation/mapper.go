@@ -1,8 +1,8 @@
-package response
+package presentation
 
-import "hobby-blog/internal/model"
+import postInfrastructureModel "hobby-blog/internal/post/infrastructure"
 
-func NewPostResponse(post model.Post) PostResponse {
+func NewPostResponse(post postInfrastructureModel.Post) PostResponse {
 	return PostResponse{
 		ID:         post.ID,
 		Title:      post.Title,
@@ -12,7 +12,7 @@ func NewPostResponse(post model.Post) PostResponse {
 	}
 }
 
-func NewPostResponses(posts []model.Post) []PostResponse {
+func NewPostResponses(posts []postInfrastructureModel.Post) []PostResponse {
 	res := make([]PostResponse, 0, len(posts))
 
 	for _, post := range posts {
@@ -22,7 +22,7 @@ func NewPostResponses(posts []model.Post) []PostResponse {
 	return res
 }
 
-func NewPostDetailResponse(post model.Post) *PostDetailResponse {
+func NewPostDetailResponse(post postInfrastructureModel.Post) *PostDetailResponse {
 	return &PostDetailResponse{
 		ID:         post.ID,
 		Title:      post.Title,
@@ -30,5 +30,13 @@ func NewPostDetailResponse(post model.Post) *PostDetailResponse {
 		User:       NewPostUserResponse(post.User),
 		Category:   NewCategoryResponse(post.Category),
 		MediaFiles: NewMediaFileResponses(post.MediaFiles),
+	}
+}
+
+func NewPostUserResponse(user postInfrastructureModel.User) PostUserResponse {
+	return PostUserResponse{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
 	}
 }

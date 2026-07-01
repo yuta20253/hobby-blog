@@ -4,6 +4,8 @@ import (
 	"gorm.io/gorm"
 	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
+	postApplication "hobby-blog/internal/post/application"
+	userApplicationUsecase "hobby-blog/internal/user/application"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/service"
 	"hobby-blog/internal/storage"
@@ -21,11 +23,11 @@ func NewContainer(db *gorm.DB) *Container {
 	cfg := config.Load()
 
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo)
+	authService := userApplicationUsecase.NewAuthService(userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
 	postRepo := repository.NewPostRepository(db)
-	postService := service.NewPostService(postRepo)
+	postService := postApplication.NewPostService(postRepo)
 	postHandler := handler.NewPostHandler(postService)
 
 	mypageService := service.NewMypageService(userRepo, postRepo)

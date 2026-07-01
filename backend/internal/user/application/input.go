@@ -1,4 +1,4 @@
-package input
+package application
 
 type SignUpInput struct {
 	Name     string

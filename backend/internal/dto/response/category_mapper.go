@@ -1,9 +1,12 @@
 package response
 
-import "hobby-blog/internal/model"
+import (
+	postPresentationResponse "hobby-blog/internal/post/presentation"
+	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
+)
 
-func NewCategoryResponse(category model.Category) CategoryResponse {
-	return CategoryResponse{
+func NewCategoryResponse(category postInfrastructureModel.Category) postPresentationResponse.CategoryResponse {
+	return postPresentationResponse.CategoryResponse{
 		ID:   category.ID,
 		Name: category.Name,
 	}

@@ -1,4 +1,4 @@
-package response
+package presentation
 
 type PostResponse struct {
 	ID         uint                `json:"id"`

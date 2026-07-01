@@ -1,16 +1,16 @@
-package service
+package application
 
 import (
+	"context"
 	"errors"
+	"strings"
+
 	"gorm.io/gorm"
+
 	"hobby-blog/internal/auth"
-	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
 	"hobby-blog/internal/pkg/password"
-	domainUser "hobby-blog/internal/domain/user"
-	serviceInput "hobby-blog/internal/service/input"
-	"strings"
-	"context"
+	domainUser "hobby-blog/internal/user/domain"
 )
 
 type AuthService struct {
@@ -21,7 +21,7 @@ func NewAuthService(repo domainUser.UserRepository) *AuthService {
 	return &AuthService{repo: repo}
 }
 
-func (s *AuthService) SignUp(ctx context.Context, input serviceInput.SignUpInput) (*response.AuthResponse, error) {
+func (s *AuthService) SignUp(ctx context.Context, input SignUpInput) (*AuthResult, error) {
 	hashedPassword, err := password.Hash(input.Password)
 
 	if err != nil {
@@ -56,13 +56,13 @@ func (s *AuthService) SignUp(ctx context.Context, input serviceInput.SignUpInput
 		return nil, err
 	}
 
-	return &response.AuthResponse{
-		User:  response.NewAuthUserResponse(user),
+	return &AuthResult{
+		User:  user,
 		Token: token,
 	}, nil
 }
 
-func (s *AuthService) Login(ctx context.Context, input serviceInput.LoginInput) (*response.AuthResponse, error) {
+func (s *AuthService) Login(ctx context.Context, input LoginInput) (*AuthResult, error) {
 	email, err := domainUser.NewEmail(input.Email)
 	if err != nil {
 		return nil, err
@@ -86,13 +86,13 @@ func (s *AuthService) Login(ctx context.Context, input serviceInput.LoginInput) 
 		return nil, err
 	}
 
-	return &response.AuthResponse{
-		User:  response.NewAuthUserResponse(user),
+	return &AuthResult{
+		User:  user,
 		Token: token,
 	}, nil
 }
 
-func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*response.AuthUserResponse, error) {
+func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*domainUser.User, error) {
 	user, err := s.repo.FindByID(ctx, domainUser.ID(id))
 
 	if err != nil {
@@ -102,9 +102,7 @@ func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*response.AuthU
 		return nil, err
 	}
 
-	resp := response.NewAuthUserResponse(user)
-
-	return &resp, nil
+	return user, nil
 }
 
 func isDuplicateError(err error) bool {

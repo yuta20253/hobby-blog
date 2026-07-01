@@ -1,13 +1,17 @@
 package response
 
-import "hobby-blog/internal/model"
+import (
+	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
+	postPresentationResponse "hobby-blog/internal/post/presentation"
+	userPresentationResponse "hobby-blog/internal/user/presentation"
+)
 
 func NewMypageResponse(
-	user model.User,
-	posts []model.Post,
+	user userPresentationResponse.AuthUserResponse,
+	posts []postInfrastructureModel.Post,
 ) *MypageResponse {
 	return &MypageResponse{
-		User:  NewPostUserResponse(user),
-		Posts: NewPostResponses(posts),
+		User:  user,
+		Posts: postPresentationResponse.NewPostResponses(posts),
 	}
 }
