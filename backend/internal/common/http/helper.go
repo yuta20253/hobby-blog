@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func getUserID(c *gin.Context) (uint, bool) {
+func GetUserID(c *gin.Context) (uint, bool) {
 	userID, exists := c.Get("userID")
 
 	if !exists {
@@ -25,7 +25,7 @@ func getUserID(c *gin.Context) (uint, bool) {
 	return uint(id), true
 }
 
-func getParamID(c *gin.Context, key string) (uint, bool) {
+func GetParamID(c *gin.Context, key string) (uint, bool) {
 	idStr := c.Param(key)
 	id, err := strconv.Atoi(idStr)
 

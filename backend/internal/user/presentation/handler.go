@@ -39,7 +39,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(200, AuthResponse{
-		User: NewAuthUserResponse(result.User),
+		User:  NewAuthUserResponse(result.User),
 		Token: result.Token,
 	})
 

@@ -10,8 +10,8 @@ import (
 )
 
 type MyPageResult struct {
-    User  userDomain.User
-    Posts []postDomain.Post
+	User  userDomain.User
+	Posts []postDomain.Post
 }
 
 type MypageService struct {
@@ -26,25 +26,22 @@ func NewMypageService(userRepo userDomain.UserRepository, postRepo postDomain.Po
 	}
 }
 
-func (s *MypageService) GetMyPage(ctx context.Context, id userDomain.ID) (*MyPageResult, error) {
+func (s *MypageService) GetMyPage(ctx context.Context, id uint) (*MyPageResult, error) {
 	user, err := s.userRepo.FindByID(ctx, id)
-
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, appErrors.ErrNotFound
 		}
-
 		return nil, err
 	}
 
-	posts, err := s.postRepo.GetMyPostsByUserID(ctx, user.ID)
-
+	posts, err := s.postRepo.GetMyPostsByUserID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
 	return &MyPageResult{
-		User: *user,
+		User:  *user,
 		Posts: posts,
 	}, nil
 }

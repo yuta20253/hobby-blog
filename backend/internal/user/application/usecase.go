@@ -93,7 +93,7 @@ func (s *AuthService) Login(ctx context.Context, input LoginInput) (*AuthResult,
 }
 
 func (s *AuthService) GetUserByID(ctx context.Context, id uint) (*domainUser.User, error) {
-	user, err := s.repo.FindByID(ctx, domainUser.ID(id))
+	user, err := s.repo.FindByID(ctx, id)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

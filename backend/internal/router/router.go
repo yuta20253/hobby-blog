@@ -1,48 +1,40 @@
 package router
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"hobby-blog/internal/config"
-	"hobby-blog/internal/handler"
-	"hobby-blog/internal/middleware"
 	"log"
 	"path/filepath"
 	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+
+	"hobby-blog/internal/config"
+	"hobby-blog/internal/handler"
+	"hobby-blog/internal/middleware"
+
+	postPresentation "hobby-blog/internal/post/presentation"
+	authPresentation "hobby-blog/internal/user/presentation"
 )
 
 func SetUpRouter(
 	cfg *config.Config,
-	authHandler *handler.AuthHandler,
-	postHandler *handler.PostHandler,
+
+	authHandler *authPresentation.AuthHandler,
+	postHandler *postPresentation.PostHandler,
+
 	mypageHandler *handler.MypageHandler,
 	mediaHandler *handler.MediaHandler,
 ) *gin.Engine {
+
 	r := gin.Default()
+
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: cfg.CORSAllowOrigins,
-
-		AllowMethods: []string{
-			"GET",
-			"POST",
-			"PATCH",
-			"DELETE",
-			"OPTIONS",
-		},
-
-		AllowHeaders: []string{
-			"Origin",
-			"Content-Type",
-			"Authorization",
-		},
-
-		ExposeHeaders: []string{
-			"Content-Length",
-		},
-
+		AllowOrigins:     cfg.CORSAllowOrigins,
+		AllowMethods:     []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
-
-		MaxAge: 12 * time.Hour,
+		MaxAge:           12 * time.Hour,
 	}))
 
 	if gin.Mode() == gin.DebugMode {

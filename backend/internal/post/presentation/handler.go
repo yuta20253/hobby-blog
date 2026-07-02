@@ -48,7 +48,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 
 func (h *PostHandler) Show(c *gin.Context) {
 
-	postId, ok := httphelper.getParamID(c, "id")
+	postId, ok := httphelper.GetParamID(c, "id")
 
 	if !ok {
 		return
@@ -74,7 +74,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 		return
 	}
 
-	uid, ok := httphelper.getUserID(c)
+	uid, ok := httphelper.GetUserID(c)
 
 	if !ok {
 		return
@@ -105,13 +105,13 @@ func (h *PostHandler) Update(c *gin.Context) {
 		return
 	}
 
-	uid, ok := httphelper.getUserID(c)
+	uid, ok := httphelper.GetUserID(c)
 
 	if !ok {
 		return
 	}
 
-	postID, ok := httphelper.getParamID(c, "id")
+	postID, ok := httphelper.GetParamID(c, "id")
 
 	if !ok {
 		return
@@ -136,19 +136,19 @@ func (h *PostHandler) Update(c *gin.Context) {
 }
 
 func (h *PostHandler) Delete(c *gin.Context) {
-	uid, ok := httphelper.getUserID(c)
+	uid, ok := httphelper.GetUserID(c)
 
 	if !ok {
 		return
 	}
 
-	postID, ok := httphelper.getParamID(c, "id")
+	postID, ok := httphelper.GetParamID(c, "id")
 
 	if !ok {
 		return
 	}
 
-	err := h.service.DeletePost(c.Request.Context(), postID)
+	err := h.service.DeletePost(c.Request.Context(), postID, uid)
 
 	if err != nil {
 		httphelper.HandleError(c, err)

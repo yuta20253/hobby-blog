@@ -2,15 +2,21 @@ package container
 
 import (
 	"gorm.io/gorm"
+
 	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/repository"
+
 	postPresentation "hobby-blog/internal/post/presentation"
 	userPresentation "hobby-blog/internal/user/presentation"
+
 	postApplication "hobby-blog/internal/post/application"
-	userApplicationUsecase "hobby-blog/internal/user/application"
-    postInfrastructure "hobby-blog/internal/post/infrastructure"
-    userInfrastructure "hobby-blog/internal/user/infrastructure"
+	userApplication "hobby-blog/internal/user/application"
+
+	postInfrastructure "hobby-blog/internal/post/infrastructure"
+	userInfrastructure "hobby-blog/internal/user/infrastructure"
+
+	"hobby-blog/internal/service"
 	"hobby-blog/internal/storage"
 	"hobby-blog/internal/uploader"
 )
@@ -26,7 +32,7 @@ func NewContainer(db *gorm.DB) *Container {
 	cfg := config.Load()
 
 	userRepo := userInfrastructure.NewUserRepository(db)
-	authService := userApplicationUsecase.NewAuthService(userRepo)
+	authService := userApplication.NewAuthService(userRepo)
 	authHandler := userPresentation.NewAuthHandler(authService)
 
 	postRepo := postInfrastructure.NewPostRepository(db)
@@ -40,6 +46,7 @@ func NewContainer(db *gorm.DB) *Container {
 
 	st := storage.NewLocalStorage(cfg.UploadPath)
 	upl := uploader.NewUploader(st)
+
 	mediaService := service.NewMediaService(postRepo, mediaRepo, upl)
 	mediaHandler := handler.NewMediaHandler(mediaService)
 

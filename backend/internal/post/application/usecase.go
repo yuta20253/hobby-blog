@@ -1,12 +1,12 @@
 package application
 
 import (
-    "context"
-    "errors"
+	"context"
+	"errors"
 
-    appErrors "hobby-blog/internal/errors"
-    postDomain "hobby-blog/internal/post/domain"
-    userDomain "hobby-blog/internal/user/domain"
+	appErrors "hobby-blog/internal/errors"
+	postDomain "hobby-blog/internal/post/domain"
+	userDomain "hobby-blog/internal/user/domain"
 )
 
 type PostService struct {
@@ -86,15 +86,24 @@ func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*p
 	return &response, nil
 }
 
-func (s *PostService) DeletePost(ctx context.Context, id uint) error {
-	post, err := s.repo.GetByID(ctx, id)
+func (s *PostService) DeletePost(
+	ctx context.Context,
+	postID uint,
+	userID uint,
+) error {
+	post, err := s.repo.GetByID(ctx, postID)
 	if err != nil {
 		return err
 	}
 	if post == nil {
 		return appErrors.ErrNotFound
 	}
-	return s.repo.Delete(ctx, id)
+
+	if uint(post.UserID) != userID {
+		return appErrors.ErrForbidden
+	}
+
+	return s.repo.Delete(ctx, postID)
 }
 
 func (s *PostService) PublishPost(ctx context.Context, id uint) error {

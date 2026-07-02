@@ -8,10 +8,10 @@ import (
 
 	"gorm.io/gorm"
 	appErrors "hobby-blog/internal/errors"
+	mediaModel "hobby-blog/internal/model"
 	postDomain "hobby-blog/internal/post/domain"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/uploader"
-	mediaModel "hobby-blog/internal/model"
 )
 
 type MediaService struct {

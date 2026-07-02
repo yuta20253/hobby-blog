@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	httphelper "hobby-blog/internal/common/http"
 	"hobby-blog/internal/service"
 )
 
@@ -16,13 +17,13 @@ func NewMediaHandler(service *service.MediaService) *MediaHandler {
 }
 
 func (h *MediaHandler) UploadMedia(c *gin.Context) {
-	uid, ok := getUserID(c)
+	uid, ok := httphelper.GetUserID(c)
 
 	if !ok {
 		return
 	}
 
-	postID, ok := getParamID(c, "id")
+	postID, ok := httphelper.GetParamID(c, "id")
 
 	if !ok {
 		return
@@ -31,14 +32,14 @@ func (h *MediaHandler) UploadMedia(c *gin.Context) {
 	file, err := c.FormFile("file")
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
-	err = h.service.CreateMedia(uid, postID, file)
+	err = h.service.CreateMedia(c.Request.Context(), uid, postID, file)
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 

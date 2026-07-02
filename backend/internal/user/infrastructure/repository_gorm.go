@@ -15,7 +15,7 @@ func NewUserRepository(db *gorm.DB) userDomain.UserRepository {
 	return &userRepository{db: db}
 }
 
-func (r *userRepository) FindByID(ctx context.Context, id userDomain.ID) (*userDomain.User, error) {
+func (r *userRepository) FindByID(ctx context.Context, id uint) (*userDomain.User, error) {
 	var m User
 	if err := r.db.WithContext(ctx).First(&m, uint(id)).Error; err != nil {
 		return nil, err
@@ -65,8 +65,8 @@ func (r *userRepository) FindByEmail(ctx context.Context, email userDomain.Email
 
 func (r *userRepository) Create(ctx context.Context, u *userDomain.User) error {
 	m := User{
-		Name: u.Name.String(),
-		Email: u.Email.String(),
+		Name:         u.Name.String(),
+		Email:        u.Email.String(),
 		PasswordHash: u.PasswordHash,
 	}
 

@@ -1,15 +1,15 @@
 package infrastructure
 
 import (
-    "context"
-    "gorm.io/gorm"
+	"context"
+	"gorm.io/gorm"
 
-    postDomain "hobby-blog/internal/post/domain"
-    userDomain "hobby-blog/internal/user/domain"
+	postDomain "hobby-blog/internal/post/domain"
+	userDomain "hobby-blog/internal/user/domain"
 )
 
 type postRepository struct {
-    db *gorm.DB
+	db *gorm.DB
 }
 
 func NewPostRepository(db *gorm.DB) postDomain.PostRepository {
@@ -155,31 +155,31 @@ func (r *postRepository) Delete(ctx context.Context, id uint) error {
 	return nil
 }
 
-func (r *postRepository) GetMyPostsByUserID(ctx context.Context, userID userDomain.ID) ([]postDomain.Post, error) {
+func (r *postRepository) GetMyPostsByUserID(ctx context.Context, userID uint) ([]postDomain.Post, error) {
 
-    var posts []Post
+	var posts []Post
 
-    err := r.db.
-        WithContext(ctx).
-        Where("user_id = ?", uint(userID)).
-        Find(&posts).Error
+	err := r.db.
+		WithContext(ctx).
+		Where("user_id = ?", uint(userID)).
+		Find(&posts).Error
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    result := make([]postDomain.Post, 0, len(posts))
+	result := make([]postDomain.Post, 0, len(posts))
 
-    for _, p := range posts {
-        result = append(result, postDomain.Post{
-            ID:         uint(p.ID),
-            UserID:     userDomain.ID(p.UserID),
-            CategoryID: p.CategoryID,
-            Title:      p.Title,
-            Content:    p.Content,
-            Status:     postDomain.Status(p.Status),
-        })
-    }
+	for _, p := range posts {
+		result = append(result, postDomain.Post{
+			ID:         uint(p.ID),
+			UserID:     userDomain.ID(p.UserID),
+			CategoryID: p.CategoryID,
+			Title:      p.Title,
+			Content:    p.Content,
+			Status:     postDomain.Status(p.Status),
+		})
+	}
 
-    return result, nil
+	return result, nil
 }

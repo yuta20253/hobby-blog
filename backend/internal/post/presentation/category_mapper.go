@@ -1,9 +1,9 @@
 package presentation
 
-import postInfrastructureModel "hobby-blog/internal/post/infrastructure"
+import postDomain "hobby-blog/internal/post/domain"
 
-func NewCategoryResponse(category postInfrastructureModel.Category) postPresentationResponse.CategoryResponse {
-	return postPresentationResponse.CategoryResponse{
+func NewCategoryResponse(category postDomain.Category) CategoryResponse {
+	return CategoryResponse{
 		ID:   category.ID,
 		Name: category.Name,
 	}
