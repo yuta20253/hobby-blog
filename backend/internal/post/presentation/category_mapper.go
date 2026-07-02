@@ -1,9 +1,6 @@
-package response
+package presentation
 
-import (
-	postPresentationResponse "hobby-blog/internal/post/presentation"
-	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
-)
+import postInfrastructureModel "hobby-blog/internal/post/infrastructure"
 
 func NewCategoryResponse(category postInfrastructureModel.Category) postPresentationResponse.CategoryResponse {
 	return postPresentationResponse.CategoryResponse{

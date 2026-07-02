@@ -1,4 +1,4 @@
-package handler
+package httphelper
 
 import (
 	"github.com/gin-gonic/gin"

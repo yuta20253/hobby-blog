@@ -1,12 +1,12 @@
 package application
 
 import (
-	"context"
-	"errors"
+    "context"
+    "errors"
 
-	appErrors "hobby-blog/internal/errors"
-	postDomain "hobby-blog/internal/post/domain"
-	postInfrastructure "hobby-blog/internal/post/infrastructure"
+    appErrors "hobby-blog/internal/errors"
+    postDomain "hobby-blog/internal/post/domain"
+    userDomain "hobby-blog/internal/user/domain"
 )
 
 type PostService struct {
@@ -17,14 +17,14 @@ func NewPostService(repo postDomain.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(ctx context.Context, query SearchPostQuery) ([]postPresentation.PostResponse, error) {
+func (s *PostService) SearchPosts(ctx context.Context, query SearchPostQuery) ([]postDomain.Post, error) {
 	posts, err := s.repo.Search(ctx, query.Title, query.UserName, query.Category, query.Limit, query.Offset)
 	if err != nil {
 		return nil, err
 	}
-	responses := make([]postPresentation.PostResponse, 0, len(posts))
+	responses := make([]postDomain.Post, 0, len(posts))
 	for _, p := range posts {
-		responses = append(responses, postPresentation.PostResponse{
+		responses = append(responses, postDomain.Post{
 			ID:      p.ID,
 			Title:   p.Title,
 			Content: p.Content,
@@ -33,7 +33,7 @@ func (s *PostService) SearchPosts(ctx context.Context, query SearchPostQuery) ([
 	return responses, nil
 }
 
-func (s *PostService) GetPost(ctx context.Context, id uint) (*postPresentation.PostResponse, error) {
+func (s *PostService) GetPost(ctx context.Context, id uint) (*postDomain.Post, error) {
 	post, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -42,16 +42,16 @@ func (s *PostService) GetPost(ctx context.Context, id uint) (*postPresentation.P
 		return nil, appErrors.ErrNotFound
 	}
 
-	response := postPresentation.PostResponse{ID: post.ID, Title: post.Title, Content: post.Content}
+	response := postDomain.Post{ID: post.ID, Title: post.Title, Content: post.Content}
 	return &response, nil
 }
 
-func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*postPresentation.PostResponse, error) {
+func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*postDomain.Post, error) {
 	post := postDomain.Post{
 		Title:      input.Title,
 		Content:    input.Content,
 		CategoryID: input.CategoryID,
-		UserID:     postDomain.UserID(input.UserID),
+		UserID:     userDomain.ID(input.UserID),
 		Status:     postDomain.StatusDraft,
 	}
 	created, err := s.repo.Create(ctx, post)
@@ -59,11 +59,11 @@ func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*p
 		return nil, err
 	}
 
-	response := postPresentation.PostResponse{ID: created.ID, Title: created.Title, Content: created.Content}
+	response := postDomain.Post{ID: created.ID, Title: created.Title, Content: created.Content}
 	return &response, nil
 }
 
-func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*postPresentation.PostResponse, error) {
+func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*postDomain.Post, error) {
 	post, err := s.repo.GetByID(ctx, input.ID)
 	if err != nil {
 		return nil, err
@@ -76,13 +76,13 @@ func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*p
 	updated.Content = input.Content
 	updated.CategoryID = input.CategoryID
 	updated.Status = input.Status
-	updated.UserID = postDomain.UserID(input.UserID)
+	updated.UserID = userDomain.ID(input.UserID)
 	result, err := s.repo.Update(ctx, updated)
 	if err != nil {
 		return nil, err
 	}
 
-	response := postPresentation.PostResponse{ID: result.ID, Title: result.Title, Content: result.Content}
+	response := postDomain.Post{ID: result.ID, Title: result.Title, Content: result.Content}
 	return &response, nil
 }
 

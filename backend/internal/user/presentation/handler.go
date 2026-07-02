@@ -2,7 +2,7 @@ package presentation
 
 import (
 	"github.com/gin-gonic/gin"
-	"hobby-blog/internal/handler"
+	httphelper "hobby-blog/internal/common/http"
 	userApplicationUsecase "hobby-blog/internal/user/application"
 )
 
@@ -34,7 +34,7 @@ func (h *AuthHandler) SignUp(c *gin.Context) {
 	)
 
 	if err != nil {
-		handler.HandleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -49,7 +49,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -75,7 +75,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 }
 
 func (h *AuthHandler) Me(c *gin.Context) {
-	uid, ok := handler.GetUserID(c)
+	uid, ok := httphelper.GetUserID(c)
 
 	if !ok {
 		return

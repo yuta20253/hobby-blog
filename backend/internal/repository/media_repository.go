@@ -2,7 +2,7 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
+	"hobby-blog/internal/model"
 )
 
 type mediaRepository struct {
@@ -10,13 +10,13 @@ type mediaRepository struct {
 }
 
 type MediaRepository interface {
-	Create(media *postInfrastructureModel.MediaFile) error
+	Create(media *model.MediaFile) error
 }
 
 func NewMediaRepository(db *gorm.DB) MediaRepository {
 	return &mediaRepository{db: db}
 }
 
-func (r *mediaRepository) Create(media *postInfrastructureModel.MediaFile) error {
+func (r *mediaRepository) Create(media *model.MediaFile) error {
 	return r.db.Create(media).Error
 }

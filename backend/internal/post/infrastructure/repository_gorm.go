@@ -154,3 +154,32 @@ func (r *postRepository) Delete(ctx context.Context, id uint) error {
 	}
 	return nil
 }
+
+func (r *postRepository) GetMyPostsByUserID(ctx context.Context, userID userDomain.ID) ([]postDomain.Post, error) {
+
+    var posts []Post
+
+    err := r.db.
+        WithContext(ctx).
+        Where("user_id = ?", uint(userID)).
+        Find(&posts).Error
+
+    if err != nil {
+        return nil, err
+    }
+
+    result := make([]postDomain.Post, 0, len(posts))
+
+    for _, p := range posts {
+        result = append(result, postDomain.Post{
+            ID:         uint(p.ID),
+            UserID:     userDomain.ID(p.UserID),
+            CategoryID: p.CategoryID,
+            Title:      p.Title,
+            Content:    p.Content,
+            Status:     postDomain.Status(p.Status),
+        })
+    }
+
+    return result, nil
+}

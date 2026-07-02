@@ -1,27 +1,33 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"gorm.io/gorm"
-	"hobby-blog/internal/dto/response"
 	appErrors "hobby-blog/internal/errors"
-	"hobby-blog/internal/repository"
+	postDomain "hobby-blog/internal/post/domain"
+	userDomain "hobby-blog/internal/user/domain"
 )
 
-type MypageService struct {
-	userRepo repository.UserRepository
-	postRepo repository.PostRepository
+type MyPageResult struct {
+    User  userDomain.User
+    Posts []postDomain.Post
 }
 
-func NewMypageService(userRepo repository.UserRepository, postRepo repository.PostRepository) *MypageService {
+type MypageService struct {
+	userRepo userDomain.UserRepository
+	postRepo postDomain.PostRepository
+}
+
+func NewMypageService(userRepo userDomain.UserRepository, postRepo postDomain.PostRepository) *MypageService {
 	return &MypageService{
 		userRepo: userRepo,
 		postRepo: postRepo,
 	}
 }
 
-func (s *MypageService) GetMyPage(id uint) (*response.MypageResponse, error) {
-	user, err := s.userRepo.FindByID(id)
+func (s *MypageService) GetMyPage(ctx context.Context, id userDomain.ID) (*MyPageResult, error) {
+	user, err := s.userRepo.FindByID(ctx, id)
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -31,11 +37,14 @@ func (s *MypageService) GetMyPage(id uint) (*response.MypageResponse, error) {
 		return nil, err
 	}
 
-	posts, err := s.postRepo.GetMyPostsByUserID(user.ID)
+	posts, err := s.postRepo.GetMyPostsByUserID(ctx, user.ID)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return response.NewMypageResponse(user, posts), nil
+	return &MyPageResult{
+		User: *user,
+		Posts: posts,
+	}, nil
 }

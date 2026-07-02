@@ -2,7 +2,7 @@ package presentation
 
 import (
 	"github.com/gin-gonic/gin"
-
+	httphelper "hobby-blog/internal/common/http"
 	postApplication "hobby-blog/internal/post/application"
 )
 
@@ -37,7 +37,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *PostHandler) Index(c *gin.Context) {
 
 func (h *PostHandler) Show(c *gin.Context) {
 
-	postId, ok := getParamID(c, "id")
+	postId, ok := httphelper.getParamID(c, "id")
 
 	if !ok {
 		return
@@ -57,7 +57,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 	post, err := h.service.GetPost(c.Request.Context(), postId)
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -70,11 +70,11 @@ func (h *PostHandler) Create(c *gin.Context) {
 	var req CreatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
-	uid, ok := getUserID(c)
+	uid, ok := httphelper.getUserID(c)
 
 	if !ok {
 		return
@@ -88,7 +88,7 @@ func (h *PostHandler) Create(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -101,17 +101,17 @@ func (h *PostHandler) Update(c *gin.Context) {
 	var req UpdatePostRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
-	uid, ok := getUserID(c)
+	uid, ok := httphelper.getUserID(c)
 
 	if !ok {
 		return
 	}
 
-	postID, ok := getParamID(c, "id")
+	postID, ok := httphelper.getParamID(c, "id")
 
 	if !ok {
 		return
@@ -126,7 +126,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 	})
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 
@@ -136,13 +136,13 @@ func (h *PostHandler) Update(c *gin.Context) {
 }
 
 func (h *PostHandler) Delete(c *gin.Context) {
-	uid, ok := getUserID(c)
+	uid, ok := httphelper.getUserID(c)
 
 	if !ok {
 		return
 	}
 
-	postID, ok := getParamID(c, "id")
+	postID, ok := httphelper.getParamID(c, "id")
 
 	if !ok {
 		return
@@ -151,7 +151,7 @@ func (h *PostHandler) Delete(c *gin.Context) {
 	err := h.service.DeletePost(c.Request.Context(), postID)
 
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 

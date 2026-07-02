@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"net/http"
 	"github.com/gin-gonic/gin"
+
+	postPresentation "hobby-blog/internal/post/presentation"
+	userPresentation "hobby-blog/internal/user/presentation"
 	"hobby-blog/internal/service"
 )
 
@@ -29,5 +33,8 @@ func (h *MypageHandler) Show(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, mypage)
+	c.JSON(200, MypageResponse{
+		User: userPresentation.NewAuthUserResponse(mypage.User),
+		Posts: postPresentation.NewPostResponses(mypage.Posts),
+	})
 }

@@ -1,4 +1,4 @@
-package handler
+package httphelper
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 	appErrors "hobby-blog/internal/errors"
 )
 
-func handleError(c *gin.Context, err error) {
+func HandleError(c *gin.Context, err error) {
 	var appErr *appErrors.AppError
 
 	if errors.As(err, &appErr) {

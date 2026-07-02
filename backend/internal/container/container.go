@@ -4,17 +4,20 @@ import (
 	"gorm.io/gorm"
 	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
+	"hobby-blog/internal/repository"
+	postPresentation "hobby-blog/internal/post/presentation"
+	userPresentation "hobby-blog/internal/user/presentation"
 	postApplication "hobby-blog/internal/post/application"
 	userApplicationUsecase "hobby-blog/internal/user/application"
-	"hobby-blog/internal/repository"
-	"hobby-blog/internal/service"
+    postInfrastructure "hobby-blog/internal/post/infrastructure"
+    userInfrastructure "hobby-blog/internal/user/infrastructure"
 	"hobby-blog/internal/storage"
 	"hobby-blog/internal/uploader"
 )
 
 type Container struct {
-	AuthHandler   *handler.AuthHandler
-	PostHandler   *handler.PostHandler
+	AuthHandler   *userPresentation.AuthHandler
+	PostHandler   *postPresentation.PostHandler
 	MypageHandler *handler.MypageHandler
 	MediaHandler  *handler.MediaHandler
 }
@@ -22,13 +25,13 @@ type Container struct {
 func NewContainer(db *gorm.DB) *Container {
 	cfg := config.Load()
 
-	userRepo := repository.NewUserRepository(db)
+	userRepo := userInfrastructure.NewUserRepository(db)
 	authService := userApplicationUsecase.NewAuthService(userRepo)
-	authHandler := handler.NewAuthHandler(authService)
+	authHandler := userPresentation.NewAuthHandler(authService)
 
-	postRepo := repository.NewPostRepository(db)
+	postRepo := postInfrastructure.NewPostRepository(db)
 	postService := postApplication.NewPostService(postRepo)
-	postHandler := handler.NewPostHandler(postService)
+	postHandler := postPresentation.NewPostHandler(postService)
 
 	mypageService := service.NewMypageService(userRepo, postRepo)
 	mypageHandler := handler.NewMypageHandler(mypageService)
