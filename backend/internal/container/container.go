@@ -2,17 +2,28 @@ package container
 
 import (
 	"gorm.io/gorm"
+
 	"hobby-blog/internal/config"
 	"hobby-blog/internal/handler"
 	"hobby-blog/internal/repository"
+
+	postPresentation "hobby-blog/internal/post/presentation"
+	userPresentation "hobby-blog/internal/user/presentation"
+
+	postApplication "hobby-blog/internal/post/application"
+	userApplication "hobby-blog/internal/user/application"
+
+	postInfrastructure "hobby-blog/internal/post/infrastructure"
+	userInfrastructure "hobby-blog/internal/user/infrastructure"
+
 	"hobby-blog/internal/service"
 	"hobby-blog/internal/storage"
 	"hobby-blog/internal/uploader"
 )
 
 type Container struct {
-	AuthHandler   *handler.AuthHandler
-	PostHandler   *handler.PostHandler
+	AuthHandler   *userPresentation.AuthHandler
+	PostHandler   *postPresentation.PostHandler
 	MypageHandler *handler.MypageHandler
 	MediaHandler  *handler.MediaHandler
 }
@@ -20,13 +31,13 @@ type Container struct {
 func NewContainer(db *gorm.DB) *Container {
 	cfg := config.Load()
 
-	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo)
-	authHandler := handler.NewAuthHandler(authService)
+	userRepo := userInfrastructure.NewUserRepository(db)
+	authService := userApplication.NewAuthService(userRepo)
+	authHandler := userPresentation.NewAuthHandler(authService)
 
-	postRepo := repository.NewPostRepository(db)
-	postService := service.NewPostService(postRepo)
-	postHandler := handler.NewPostHandler(postService)
+	postRepo := postInfrastructure.NewPostRepository(db)
+	postService := postApplication.NewPostService(postRepo)
+	postHandler := postPresentation.NewPostHandler(postService)
 
 	mypageService := service.NewMypageService(userRepo, postRepo)
 	mypageHandler := handler.NewMypageHandler(mypageService)
@@ -35,6 +46,7 @@ func NewContainer(db *gorm.DB) *Container {
 
 	st := storage.NewLocalStorage(cfg.UploadPath)
 	upl := uploader.NewUploader(st)
+
 	mediaService := service.NewMediaService(postRepo, mediaRepo, upl)
 	mediaHandler := handler.NewMediaHandler(mediaService)
 

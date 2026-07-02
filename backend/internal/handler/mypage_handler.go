@@ -2,6 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+
+	httphelper "hobby-blog/internal/common/http"
 	"hobby-blog/internal/service"
 )
 
@@ -16,16 +18,14 @@ func NewMypageHandler(service *service.MypageService) *MypageHandler {
 }
 
 func (h *MypageHandler) Show(c *gin.Context) {
-	uid, ok := getUserID(c)
-
+	uid, ok := httphelper.GetUserID(c)
 	if !ok {
 		return
 	}
 
-	mypage, err := h.service.GetMyPage(uid)
-
+	mypage, err := h.service.GetMyPage(c.Request.Context(), uid)
 	if err != nil {
-		handleError(c, err)
+		httphelper.HandleError(c, err)
 		return
 	}
 

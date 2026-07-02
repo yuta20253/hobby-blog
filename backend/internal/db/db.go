@@ -9,7 +9,8 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	"hobby-blog/internal/model"
+	postInfrastructureModel "hobby-blog/internal/post/infrastructure"
+	userInfrastructureModel "hobby-blog/internal/user/infrastructure"
 )
 
 func ConnectDB() *gorm.DB {
@@ -29,7 +30,7 @@ func ConnectDB() *gorm.DB {
 		log.Fatal("DB connection failed:", err)
 	}
 
-	if err := db.AutoMigrate(&model.User{}, &model.Category{}, &model.Post{}, &model.MediaFile{}); err != nil {
+	if err := db.AutoMigrate(&userInfrastructureModel.User{}, &postInfrastructureModel.Post{}); err != nil {
 		log.Fatal("Migration failed:", err)
 	}
 

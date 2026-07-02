@@ -1,25 +1,27 @@
 package service
 
 import (
+	"context"
 	stdErrors "errors"
 	"mime/multipart"
 	"path/filepath"
 
 	"gorm.io/gorm"
 	appErrors "hobby-blog/internal/errors"
-	"hobby-blog/internal/model"
+	mediaModel "hobby-blog/internal/model"
+	postDomain "hobby-blog/internal/post/domain"
 	"hobby-blog/internal/repository"
 	"hobby-blog/internal/uploader"
 )
 
 type MediaService struct {
-	postRepo  repository.PostRepository
+	postRepo  postDomain.PostRepository
 	mediaRepo repository.MediaRepository
 	uploader  *uploader.Uploader
 }
 
 func NewMediaService(
-	postRepo repository.PostRepository,
+	postRepo postDomain.PostRepository,
 	mediaRepo repository.MediaRepository,
 	uploader *uploader.Uploader,
 ) *MediaService {
@@ -30,8 +32,8 @@ func NewMediaService(
 	}
 }
 
-func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.FileHeader) error {
-	post, err := s.postRepo.FindByID(postID)
+func (s *MediaService) CreateMedia(ctx context.Context, userID uint, postID uint, file *multipart.FileHeader) error {
+	post, err := s.postRepo.GetByID(ctx, postID)
 	if err != nil {
 		if stdErrors.Is(err, gorm.ErrRecordNotFound) {
 			return appErrors.ErrNotFound
@@ -39,7 +41,7 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 		return err
 	}
 
-	if post.UserID != userID {
+	if uint(post.UserID) != userID {
 		return appErrors.ErrForbidden
 	}
 
@@ -48,7 +50,7 @@ func (s *MediaService) CreateMedia(userID uint, postID uint, file *multipart.Fil
 		return err
 	}
 
-	err = s.mediaRepo.Create(&model.MediaFile{
+	err = s.mediaRepo.Create(&mediaModel.MediaFile{
 		PostID:   postID,
 		Type:     mediaType,
 		FilePath: filePath,
