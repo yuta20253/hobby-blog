@@ -42,19 +42,19 @@ func (h *PostHandler) Index(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"posts": posts,
+		"posts": NewPostResponses(posts),
 	})
 }
 
 func (h *PostHandler) Show(c *gin.Context) {
 
-	postId, ok := httphelper.GetParamID(c, "id")
+	postID, ok := httphelper.GetParamID(c, "id")
 
 	if !ok {
 		return
 	}
 
-	post, err := h.service.GetPost(c.Request.Context(), postId)
+	post, err := h.service.GetPost(c.Request.Context(), postID)
 
 	if err != nil {
 		httphelper.HandleError(c, err)
@@ -62,7 +62,7 @@ func (h *PostHandler) Show(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"post": post,
+		"post": NewPostResponse(*post),
 	})
 }
 
@@ -131,7 +131,7 @@ func (h *PostHandler) Update(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"post": updatedPost,
+		"post": NewPostResponse(*updatedPost),
 	})
 }
 

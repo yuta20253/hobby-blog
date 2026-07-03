@@ -3,6 +3,7 @@ package httphelper
 import (
 	"errors"
 	"github.com/go-playground/validator/v10"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func HandleError(c *gin.Context, err error) {
 		return
 	}
 
-	c.Error(err)
+	log.Println(err)
 
 	c.JSON(http.StatusInternalServerError, response.ErrorResponse{
 		Error: "internal server error",

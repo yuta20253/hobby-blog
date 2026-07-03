@@ -1,16 +1,14 @@
 package application
 
+import postDomain "hobby-blog/internal/post/domain"
+
 type PostDTO struct {
 	ID      uint
 	Title   string
 	Content string
 	Status  string
 
-	User UserDTO
-
 	Category CategoryDTO
-
-	MediaFiles []MediaFileDTO
 }
 
 type UserDTO struct {
@@ -29,4 +27,17 @@ type MediaFileDTO struct {
 	Type     string
 	FilePath string
 	FileName string
+}
+
+func NewPostDTO(post postDomain.Post) PostDTO {
+	return PostDTO{
+		ID:      post.ID,
+		Title:   post.Title,
+		Content: post.Content,
+		Status:  string(post.Status),
+		Category: CategoryDTO{
+			ID:   post.Category.ID,
+			Name: post.Category.Name,
+		},
+	}
 }
