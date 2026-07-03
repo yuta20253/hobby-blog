@@ -1,17 +1,17 @@
-package handler
+package presentation
 
 import (
 	"github.com/gin-gonic/gin"
 
 	httphelper "hobby-blog/internal/common/http"
-	"hobby-blog/internal/service"
+	mypageApplication "hobby-blog/internal/mypage/application"
 )
 
 type MypageHandler struct {
-	service *service.MypageService
+	service *mypageApplication.MypageService
 }
 
-func NewMypageHandler(service *service.MypageService) *MypageHandler {
+func NewMypageHandler(service *mypageApplication.MypageService) *MypageHandler {
 	return &MypageHandler{
 		service: service,
 	}

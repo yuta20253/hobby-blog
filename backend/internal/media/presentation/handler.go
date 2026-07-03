@@ -1,16 +1,16 @@
-package handler
+package presentation
 
 import (
 	"github.com/gin-gonic/gin"
 	httphelper "hobby-blog/internal/common/http"
-	"hobby-blog/internal/service"
+	mediaApplication "hobby-blog/internal/media/application"
 )
 
 type MediaHandler struct {
-	service *service.MediaService
+	service *mediaApplication.MediaService
 }
 
-func NewMediaHandler(service *service.MediaService) *MediaHandler {
+func NewMediaHandler(service *mediaApplication.MediaService) *MediaHandler {
 	return &MediaHandler{
 		service: service,
 	}

@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 	"path/filepath"
 
-	"hobby-blog/internal/domain/media"
 	appErrors "hobby-blog/internal/errors"
+	mediaDomain "hobby-blog/internal/media/domain"
 	"hobby-blog/internal/storage"
 )
 
@@ -25,7 +25,7 @@ func NewUploader(st storage.FileStorage) *Uploader {
 	}
 }
 
-func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error) {
+func (u *Uploader) Upload(file *multipart.FileHeader) (string, mediaDomain.Type, error) {
 	f, err := file.Open()
 	if err != nil {
 		return "", "", err
@@ -41,12 +41,12 @@ func (u *Uploader) Upload(file *multipart.FileHeader) (string, media.Type, error
 	contentType := http.DetectContentType(buffer[:n])
 	log.Printf("[DEBUG] File: %s, ContentType: %s, Size: %d bytes", file.Filename, contentType, file.Size)
 
-	var mediaType media.Type
+	var mediaType mediaDomain.Type
 	switch {
 	case strings.HasPrefix(contentType, "image/"):
-		mediaType = media.TypeImage
+		mediaType = mediaDomain.TypeImage
 	case strings.HasPrefix(contentType, "video/"):
-		mediaType = media.TypeVideo
+		mediaType = mediaDomain.TypeVideo
 	default:
 		log.Printf("[ERROR] Unsupported media type: %s", contentType)
 		return "", "", appErrors.ErrUnsupportedMedia

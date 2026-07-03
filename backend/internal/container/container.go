@@ -4,19 +4,21 @@ import (
 	"gorm.io/gorm"
 
 	"hobby-blog/internal/config"
-	"hobby-blog/internal/handler"
-	"hobby-blog/internal/repository"
 
+	mediaPresentation "hobby-blog/internal/media/presentation"
+	mypagePresentation "hobby-blog/internal/mypage/presentation"
 	postPresentation "hobby-blog/internal/post/presentation"
 	userPresentation "hobby-blog/internal/user/presentation"
 
+	mediaApplication "hobby-blog/internal/media/application"
+	mypageApplication "hobby-blog/internal/mypage/application"
 	postApplication "hobby-blog/internal/post/application"
 	userApplication "hobby-blog/internal/user/application"
 
+	mediaInfrastructure "hobby-blog/internal/media/infrastructure"
 	postInfrastructure "hobby-blog/internal/post/infrastructure"
 	userInfrastructure "hobby-blog/internal/user/infrastructure"
 
-	"hobby-blog/internal/service"
 	"hobby-blog/internal/storage"
 	"hobby-blog/internal/uploader"
 )
@@ -24,8 +26,8 @@ import (
 type Container struct {
 	AuthHandler   *userPresentation.AuthHandler
 	PostHandler   *postPresentation.PostHandler
-	MypageHandler *handler.MypageHandler
-	MediaHandler  *handler.MediaHandler
+	MypageHandler *mypagePresentation.MypageHandler
+	MediaHandler  *mediaPresentation.MediaHandler
 }
 
 func NewContainer(db *gorm.DB) *Container {
@@ -39,16 +41,16 @@ func NewContainer(db *gorm.DB) *Container {
 	postService := postApplication.NewPostService(postRepo)
 	postHandler := postPresentation.NewPostHandler(postService)
 
-	mypageService := service.NewMypageService(userRepo, postRepo)
-	mypageHandler := handler.NewMypageHandler(mypageService)
+	mypageService := mypageApplication.NewMypageService(userRepo, postRepo)
+	mypageHandler := mypagePresentation.NewMypageHandler(mypageService)
 
-	mediaRepo := repository.NewMediaRepository(db)
+	mediaRepo := mediaInfrastructure.NewMediaRepository(db)
 
 	st := storage.NewLocalStorage(cfg.UploadPath)
 	upl := uploader.NewUploader(st)
 
-	mediaService := service.NewMediaService(postRepo, mediaRepo, upl)
-	mediaHandler := handler.NewMediaHandler(mediaService)
+	mediaService := mediaApplication.NewMediaService(postRepo, mediaRepo, upl)
+	mediaHandler := mediaPresentation.NewMediaHandler(mediaService)
 
 	return &Container{
 		AuthHandler:   authHandler,
