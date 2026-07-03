@@ -2,7 +2,6 @@ package application
 
 import (
 	"context"
-	"errors"
 
 	appErrors "hobby-blog/internal/errors"
 	postDomain "hobby-blog/internal/post/domain"
@@ -17,36 +16,25 @@ func NewPostService(repo postDomain.PostRepository) *PostService {
 	return &PostService{repo: repo}
 }
 
-func (s *PostService) SearchPosts(ctx context.Context, query SearchPostQuery) ([]postDomain.Post, error) {
+func (s *PostService) SearchPosts(ctx context.Context, query SearchPostQuery) ([]PostDTO, error) {
 	posts, err := s.repo.Search(ctx, query.Title, query.UserName, query.Category, query.Limit, query.Offset)
 	if err != nil {
 		return nil, err
 	}
-	responses := make([]postDomain.Post, 0, len(posts))
-	for _, p := range posts {
-		responses = append(responses, postDomain.Post{
-			ID:      p.ID,
-			Title:   p.Title,
-			Content: p.Content,
-		})
-	}
-	return responses, nil
+
+	return ToPostDTOs(posts), nil
 }
 
-func (s *PostService) GetPost(ctx context.Context, id uint) (*postDomain.Post, error) {
+func (s *PostService) GetPost(ctx context.Context, id uint) (*PostDTO, error) {
 	post, err := s.repo.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	if post == nil {
-		return nil, appErrors.ErrNotFound
-	}
 
-	response := postDomain.Post{ID: post.ID, Title: post.Title, Content: post.Content}
-	return &response, nil
+	return ToPostDTO(post), nil
 }
 
-func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*postDomain.Post, error) {
+func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*PostDTO, error) {
 	post := postDomain.Post{
 		Title:      input.Title,
 		Content:    input.Content,
@@ -59,11 +47,10 @@ func (s *PostService) CreatePost(ctx context.Context, input CreatePostInput) (*p
 		return nil, err
 	}
 
-	response := postDomain.Post{ID: created.ID, Title: created.Title, Content: created.Content}
-	return &response, nil
+	return ToPostDTO(created), nil
 }
 
-func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*postDomain.Post, error) {
+func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*PostDTO, error) {
 	post, err := s.repo.GetByID(ctx, input.ID)
 	if err != nil {
 		return nil, err
@@ -82,8 +69,7 @@ func (s *PostService) UpdatePost(ctx context.Context, input UpdatePostInput) (*p
 		return nil, err
 	}
 
-	response := postDomain.Post{ID: result.ID, Title: result.Title, Content: result.Content}
-	return &response, nil
+	return ToPostDTO(result), nil
 }
 
 func (s *PostService) DeletePost(
@@ -104,20 +90,4 @@ func (s *PostService) DeletePost(
 	}
 
 	return s.repo.Delete(ctx, postID)
-}
-
-func (s *PostService) PublishPost(ctx context.Context, id uint) error {
-	post, err := s.repo.GetByID(ctx, id)
-	if err != nil {
-		return err
-	}
-	if post == nil {
-		return appErrors.ErrNotFound
-	}
-	if post.Status != postDomain.StatusDraft {
-		return errors.New("post is already published")
-	}
-	post.Status = postDomain.StatusPublished
-	_, err = s.repo.Update(ctx, *post)
-	return err
 }
