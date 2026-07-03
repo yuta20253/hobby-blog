@@ -9,9 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"hobby-blog/internal/config"
-	"hobby-blog/internal/handler"
 	"hobby-blog/internal/middleware"
 
+	mediaPresentation "hobby-blog/internal/media/presentation"
+	mypagePresentation "hobby-blog/internal/mypage/presentation"
 	postPresentation "hobby-blog/internal/post/presentation"
 	authPresentation "hobby-blog/internal/user/presentation"
 )
@@ -22,8 +23,8 @@ func SetUpRouter(
 	authHandler *authPresentation.AuthHandler,
 	postHandler *postPresentation.PostHandler,
 
-	mypageHandler *handler.MypageHandler,
-	mediaHandler *handler.MediaHandler,
+	mypageHandler *mypagePresentation.MypageHandler,
+	mediaHandler *mediaPresentation.MediaHandler,
 ) *gin.Engine {
 
 	r := gin.Default()

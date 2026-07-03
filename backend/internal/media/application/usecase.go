@@ -1,4 +1,4 @@
-package service
+package application
 
 import (
 	"context"
@@ -8,21 +8,20 @@ import (
 
 	"gorm.io/gorm"
 	appErrors "hobby-blog/internal/errors"
-	mediaModel "hobby-blog/internal/model"
+	mediaDomain "hobby-blog/internal/media/domain"
 	postDomain "hobby-blog/internal/post/domain"
-	"hobby-blog/internal/repository"
 	"hobby-blog/internal/uploader"
 )
 
 type MediaService struct {
 	postRepo  postDomain.PostRepository
-	mediaRepo repository.MediaRepository
+	mediaRepo mediaDomain.MediaRepository
 	uploader  *uploader.Uploader
 }
 
 func NewMediaService(
 	postRepo postDomain.PostRepository,
-	mediaRepo repository.MediaRepository,
+	mediaRepo mediaDomain.MediaRepository,
 	uploader *uploader.Uploader,
 ) *MediaService {
 	return &MediaService{
@@ -50,7 +49,7 @@ func (s *MediaService) CreateMedia(ctx context.Context, userID uint, postID uint
 		return err
 	}
 
-	err = s.mediaRepo.Create(&mediaModel.MediaFile{
+	err = s.mediaRepo.Create(ctx, mediaDomain.Media{
 		PostID:   postID,
 		Type:     mediaType,
 		FilePath: filePath,
