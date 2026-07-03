@@ -12,3 +12,8 @@ type Post struct {
 	Content    string `gorm:"type:text;not null" json:"content"`
 	Status     string `gorm:"type:varchar(20);not null;default:'draft'" json:"status"`
 }
+
+type Category struct {
+	gorm.Model
+	Name string `gorm:"type:varchar(50);unique;not null" json:"name"`
+}
